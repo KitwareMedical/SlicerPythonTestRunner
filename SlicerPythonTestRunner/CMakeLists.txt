@@ -7,6 +7,7 @@ set(MODULE_PYTHON_SCRIPTS
   SlicerPythonTestRunnerLib/__init__.py
   SlicerPythonTestRunnerLib/Case.py
   SlicerPythonTestRunnerLib/Decoractor.py
+  SlicerPythonTestRunnerLib/EnsureRequirements.py
   SlicerPythonTestRunnerLib/IconPath.py
   SlicerPythonTestRunnerLib/LoadingWidget.py
   SlicerPythonTestRunnerLib/QWidget.py

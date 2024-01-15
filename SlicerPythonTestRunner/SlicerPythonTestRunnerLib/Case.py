@@ -108,7 +108,7 @@ class Case:
         if not nodeid:
             return []
 
-        nodeIdHead = re.split(r"[^a-zA-Z0-9:_.\s]", nodeid)[0]
+        nodeIdHead = re.split(r"[^a-zA-Z0-9:_./\\\s]", nodeid)[0]
         nodeIdTail = nodeid[len(nodeIdHead):]
         nodeIdParts = nodeIdHead.split("::")
         nodeIdParts[-1] += nodeIdTail

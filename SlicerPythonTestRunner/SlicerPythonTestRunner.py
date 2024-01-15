@@ -4,15 +4,7 @@ import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
 
-from SlicerPythonTestRunnerLib import RunnerLogic, RunnerWidget
-
-try:
-    import pytest
-    import pytest_jsonreport
-except ImportError:
-    slicer.util.pip_install("pytest")
-    slicer.util.pip_install("pytest-json-report")
-    import pytest
+from SlicerPythonTestRunnerLib import RunnerLogic, RunnerWidget, RunSettings
 
 
 class SlicerPythonTestRunner(ScriptedLoadableModule):
@@ -63,7 +55,7 @@ class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
         slicer.mrmlScene.Clear()
 
         currentDirTest = Path(__file__).parent.joinpath("Testing")
-        results = RunnerLogic().runAndWaitFinished(currentDirTest, runSettings)
+        results = RunnerLogic().runAndWaitFinished(currentDirTest, RunSettings(doUseMainWindow=False))
 
         if results.failuresNumber:
             slicer.util.errorDisplay(f"Test failed :\n{results.getFailingCasesString()}")

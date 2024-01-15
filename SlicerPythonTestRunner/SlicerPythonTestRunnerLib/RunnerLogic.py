@@ -23,7 +23,7 @@ class RunnerLogic:
     @staticmethod
     def default_path() -> Path:
         return next(
-            file for file in Path(sys.executable).joinpath("..", "..").glob("Slicer*") if file.is_file()
+            file for file in Path(sys.executable).joinpath("..", "..").resolve().glob("Slicer*") if file.is_file()
         ).resolve()
 
     @staticmethod

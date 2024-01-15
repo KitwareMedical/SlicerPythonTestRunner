@@ -185,6 +185,8 @@ def test_runner_can_collect_files_only(a_test_runner, a_collection_of_3_test_dir
         ("test_case.py::TestCase::test_hello_world", "test_case.py::TestCase"),
         ("test_case.py::test_my_test", "test_case.py"),
         ("test_case.py::test_my_test::parametrized[A::B::C]", "test_case.py::test_my_test"),
+        ("A/B/test_case.py::test_my_test", "A/B/test_case.py"),
+        ("A\\test_case.py::test_my_test", "A\\test_case.py"),
     ]
 )
 def test_a_case_base_ids(nodeid, exp_parent_id):
