@@ -142,6 +142,8 @@ class RunnerLogic:
 
         file_content = (
             "import sys\n"
+            "import os\n"
+            f'os.chdir(r"{path}")\n'
             f'sys.path.extend({self._libPaths()})\n'
             "from SlicerPythonTestRunnerLib import RunnerLogic, RunSettings\n"
             f'runSettings = RunSettings.fromFile(r"{run_settings_path.as_posix()}")\n'

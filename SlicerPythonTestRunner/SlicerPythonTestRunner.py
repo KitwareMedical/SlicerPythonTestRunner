@@ -24,7 +24,7 @@ class SlicerPythonTestRunner(ScriptedLoadableModule):
             "3D Slicer process.<br>"
             "After the tests have been run, the results are displayed in the UI.<br><br>"
             "The plugin also provides decorators to help running unit tests directly in your favorite IDEs.\n"
-            'Learn more on our <a href="https://github.com/KitwareMedical/SlicerPythonTestRunnerExtension">'
+            'Learn more on our <a href="https://github.com/KitwareMedical/SlicerPythonTestRunner">'
             'github page</a>'
         )
         self.parent.acknowledgementText = ""
