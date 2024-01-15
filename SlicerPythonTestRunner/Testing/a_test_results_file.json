@@ -1,0 +1,137 @@
+{
+  "created": 1704890752.678558,
+  "duration": 0.13700008392333984,
+  "exitcode": 1,
+  "root": "C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-199\\test_runner_tests_can_be_parse0",
+  "environment": {},
+  "summary": {
+    "failed": 1,
+    "passed": 2,
+    "total": 3,
+    "collected": 3
+  },
+  "collectors": [
+    {
+      "nodeid": "",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_failing_file.py",
+          "type": "Module"
+        },
+        {
+          "nodeid": "test_success_file_two_tests.py",
+          "type": "Module"
+        }
+      ]
+    },
+    {
+      "nodeid": "test_failing_file.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_failing_file.py::test_failing",
+          "type": "Function",
+          "lineno": 0
+        }
+      ]
+    },
+    {
+      "nodeid": "test_success_file_two_tests.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "test_success_file_two_tests.py::test_success_1",
+          "type": "Function",
+          "lineno": 0
+        },
+        {
+          "nodeid": "test_success_file_two_tests.py::test_success_2",
+          "type": "Function",
+          "lineno": 2
+        }
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "nodeid": "test_failing_file.py::test_failing",
+      "lineno": 0,
+      "outcome": "failed",
+      "keywords": [
+        "test_failing",
+        "test_failing_file.py",
+        "test_runner_tests_can_be_parse0"
+      ],
+      "setup": {
+        "duration": 0.0003716999999998638,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.0006563000000001651,
+        "outcome": "failed",
+        "crash": {
+          "path": "C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-199\\test_runner_tests_can_be_parse0\\test_failing_file.py",
+          "lineno": 2,
+          "message": "assert False"
+        },
+        "traceback": [
+          {
+            "path": "C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-199\\test_runner_tests_can_be_parse0\\test_failing_file.py",
+            "lineno": 2,
+            "message": "AssertionError"
+          }
+        ],
+        "longrepr": "def test_failing():\n>     assert False\nE     assert False\n\nC:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-199\\test_runner_tests_can_be_parse0\\test_failing_file.py:2: AssertionError"
+      },
+      "teardown": {
+        "duration": 0.0003661999999999832,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_success_file_two_tests.py::test_success_1",
+      "lineno": 0,
+      "outcome": "passed",
+      "keywords": [
+        "test_success_1",
+        "test_success_file_two_tests.py",
+        "test_runner_tests_can_be_parse0"
+      ],
+      "setup": {
+        "duration": 0.0005374000000000212,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.00029769999999995633,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.00025660000000016225,
+        "outcome": "passed"
+      }
+    },
+    {
+      "nodeid": "test_success_file_two_tests.py::test_success_2",
+      "lineno": 2,
+      "outcome": "passed",
+      "keywords": [
+        "test_success_2",
+        "test_success_file_two_tests.py",
+        "test_runner_tests_can_be_parse0"
+      ],
+      "setup": {
+        "duration": 0.0002533999999998482,
+        "outcome": "passed"
+      },
+      "call": {
+        "duration": 0.00026839999999994646,
+        "outcome": "passed"
+      },
+      "teardown": {
+        "duration": 0.0002458999999999101,
+        "outcome": "passed"
+      }
+    }
+  ]
+}
