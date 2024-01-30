@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from SlicerPythonTestRunnerLib import runTestInSlicerContext, Outcome, RunnerLogic, RunSettings
-from SlicerPythonTestRunnerLib import Results, TreeView
+from SlicerPythonTestRunnerLib import runTestInSlicerContext, Outcome, RunnerLogic, RunSettings, Results, TreeView
+from Testing.utils import write_file, a_file_with_one_passed_one_failed_one_skipped_content
 
 
 @pytest.fixture
@@ -47,20 +47,7 @@ def test_a_tree_view_displays_test_result_outcomes(a_json_test_result_file):
 
 @pytest.fixture()
 def a_file_with_one_passed_one_failed_one_skipped(tmpdir):
-    out_file = Path(tmpdir).joinpath("test_3_tests.py")
-    with open(out_file, "w") as f:
-        f.write(
-            "import pytest\n"
-            "def test_passed():\n"
-            "  pass\n"
-            "def test_failed():\n"
-            "  assert False\n"
-            "@pytest.mark.skip(reason='No testing here')\n"
-            "def test_skipped():\n"
-            "  pass\n"
-        )
-
-    return out_file
+    return write_file(tmpdir, "test_3_tests.py", a_file_with_one_passed_one_failed_one_skipped_content())
 
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))

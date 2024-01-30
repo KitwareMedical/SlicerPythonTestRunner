@@ -1,7 +1,11 @@
-from SlicerPythonTestRunnerLib import RunnerLogic, Results, Case, runTestInSlicerContext, RunSettings
-import pytest
 from pathlib import Path
+
+import pytest
 import qt
+
+from SlicerPythonTestRunnerLib import RunnerLogic, Results, Case, runTestInSlicerContext, RunSettings
+from Testing.utils import a_reporting_failing_test_content, a_success_test_content, a_slicer_test_content, \
+    a_failing_test_content, a_succeeding_test_file_with_two_tests_content, a_unittest_case_content, write_file
 
 
 @pytest.fixture()
@@ -11,14 +15,7 @@ def a_test_runner():
 
 @pytest.fixture()
 def a_succeeding_test_file(tmpdir):
-    file_path = Path(tmpdir).joinpath("test_success_file.py")
-
-    with open(file_path, "w") as f:
-        f.write(
-            "def test_success():\n"
-            "  assert True\n"
-        )
-    return file_path
+    return write_file(tmpdir, "test_success_file.py", a_success_test_content())
 
 
 def test_runner_can_run_tests_in_given_directory(a_test_runner, a_succeeding_test_file, tmpdir):
@@ -28,16 +25,7 @@ def test_runner_can_run_tests_in_given_directory(a_test_runner, a_succeeding_tes
 
 @pytest.fixture()
 def a_slicer_import_test_file(tmpdir):
-    file_path = Path(tmpdir).joinpath("test_slicer_file.py")
-
-    with open(file_path, "w") as f:
-        f.write(
-            "def test_slicer():\n"
-            "  import slicer\n"
-            "  node = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLScalarVolumeNode')\n"
-            "  assert node\n"
-        )
-    return file_path
+    return write_file(tmpdir, "test_slicer_file.py", a_slicer_test_content())
 
 
 def test_runner_is_compatible_with_slicer_content(a_test_runner, a_slicer_import_test_file, tmpdir):
@@ -47,14 +35,7 @@ def test_runner_is_compatible_with_slicer_content(a_test_runner, a_slicer_import
 
 @pytest.fixture()
 def a_failing_test_file(tmpdir):
-    file_path = Path(tmpdir).joinpath("test_failing_file.py")
-
-    with open(file_path, "w") as f:
-        f.write(
-            "def test_failing():\n"
-            "  assert False\n"
-        )
-    return file_path
+    return write_file(tmpdir, "test_failing_file.py", a_failing_test_content())
 
 
 def test_runner_can_run_failing_tests(a_test_runner, a_failing_test_file, tmpdir):
@@ -64,16 +45,7 @@ def test_runner_can_run_failing_tests(a_test_runner, a_failing_test_file, tmpdir
 
 @pytest.fixture()
 def a_succeeding_test_file_with_two_tests(tmpdir):
-    file_path = Path(tmpdir).joinpath("test_success_file_two_tests.py")
-
-    with open(file_path, "w") as f:
-        f.write(
-            "def test_success_1():\n"
-            "  pass\n"
-            "def test_success_2():\n"
-            "  pass\n"
-        )
-    return file_path
+    return write_file(tmpdir, "test_success_file_two_tests.py", a_succeeding_test_file_with_two_tests_content())
 
 
 @pytest.fixture()
@@ -102,17 +74,7 @@ def a_reporting_failing_test_file(tmpdir):
     file_path = Path(tmpdir).joinpath("test_failing_file.py")
 
     with open(file_path, "w") as f:
-        f.write(
-            "import logging\n"
-            "import sys\n"
-            "def test_failing():\n"
-            "  print('STD OUT')\n"
-            "  print('STD ERR', file=sys.stderr)\n"
-            "  logging.exception('LOGGING EXCEPTION')\n"
-            "  logging.debug('LOGGING DEBUG')\n"
-            "  logging.warn('LOGGING WARN')\n"
-            "  assert False\n"
-        )
+        f.write(a_reporting_failing_test_content())
     return file_path
 
 
@@ -130,18 +92,7 @@ def test_runner_contains_print_reporting(a_test_runner, a_reporting_failing_test
 
 @pytest.fixture
 def a_unittest_case_file(tmpdir):
-    file_path = Path(tmpdir).joinpath("unittest_file.py")
-
-    with open(file_path, "w") as f:
-        f.write(
-            "import unittest\n"
-            "class MyTestCase(unittest.TestCase):\n"
-            "  def test_success(self):\n"
-            "    self.assertTrue(True)\n"
-            "  def test_failing(self):\n"
-            "    self.assertTrue(False)\n"
-        )
-    return file_path
+    return write_file(tmpdir, "unittest_file.py", a_unittest_case_content())
 
 
 def test_runner_can_run_unittest_test_case_files(a_test_runner, a_unittest_case_file, tmpdir):
@@ -208,3 +159,99 @@ def test_runner_prepare_run_can_be_used_by_q_process(a_test_runner, a_succeeding
     assert path.exists()
     results = Results.fromReportFile(path)
     assert results.passedNumber == 1
+
+
+@pytest.mark.parametrize(
+    "file_path,cov_format",
+    [
+        ("report.xml", ["xml"]),
+        ("report.json", ["json"]),
+        ("report.info", ["lcov"]),
+        ("report_dir", ["html"]),
+    ]
+)
+def test_runner_supports_coverage_files(
+        a_test_runner,
+        a_succeeding_test_file_with_two_tests,
+        tmpdir,
+        file_path,
+        cov_format
+):
+    coverage_path = Path(tmpdir).joinpath(file_path)
+    settings = RunSettings(
+        doRunCoverage=True,
+        doUseMainWindow=False,
+        coverageReportFormats=cov_format,
+        coverageFilePath=coverage_path.as_posix()
+    )
+    a_test_runner.runAndWaitFinished(tmpdir, settings)
+    assert coverage_path.exists()
+
+
+@pytest.fixture
+def a_project_with_configuration_files(tmpdir):
+    s1 = (
+        "def f_a():\n"
+        "  print('a')\n"
+    )
+    s2 = (
+        "from .s1 import f_a\n"
+        "def f_b():\n"
+        "  f_a()\n"
+        "  print('b')\n"
+    )
+
+    s_init = (
+        "from .s1 import *\n"
+        "from .s2 import *\n"
+    )
+
+    test_a = (
+        "from src_lib import f_a\n"
+        "def test_f_a():\n"
+        "  f_a()\n"
+    )
+
+    test_b = (
+        "from src_lib import f_b\n"
+        "def test_f_b():\n"
+        "  f_b()\n"
+    )
+
+    pytest_ini = (
+        "[pytest]\n"
+        "minversion = 6.0\n"
+        "pythonpath = ./\n"
+        "testpaths =\n"
+        "    ./weird_test_name\n"
+    )
+
+    coverage_file = (
+        "[run]\n"
+        "branch = True\n\n"
+        "[html]\n"
+        "directory = coverage_html_report\n"
+    )
+
+    write_file(tmpdir, "src_lib/__init__.py", s_init)
+    write_file(tmpdir, "src_lib/s1.py", s1)
+    write_file(tmpdir, "src_lib/s2.py", s2)
+    write_file(tmpdir, "weird_test_name/test_a.py", test_a)
+    write_file(tmpdir, "weird_test_name/test_b.py", test_b)
+    write_file(tmpdir, "pytest.ini", pytest_ini)
+    write_file(tmpdir, ".coveragerc", coverage_file)
+
+    return tmpdir
+
+
+def test_runner_uses_local_config_files_if_present_in_the_run_dir(
+        tmpdir,
+        a_project_with_configuration_files,
+        a_test_runner
+):
+    res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(doUseMainWindow=False, doRunCoverage=True))
+    assert res.executedNumber == 2
+    assert res.passedNumber == 2
+    report_path = Path(tmpdir).joinpath("coverage_html_report")
+    assert report_path.exists()
+    assert report_path.joinpath("index.html").exists()

@@ -9,40 +9,96 @@ except AttributeError:
     QDialog = object
 
 
+def create_checkbox(tooltip, isChecked):
+    checkbox = qt.QCheckBox()
+    checkbox.setToolTip(tooltip)
+    checkbox.setChecked(isChecked)
+    return checkbox
+
+
+def create_text_list_line_edit(tooltip, placeholder, textArgs):
+    line_edit = qt.QLineEdit()
+    line_edit.setToolTip(tooltip)
+    line_edit.setPlaceholderText(placeholder)
+
+    textArgs = textArgs or []
+    if isinstance(textArgs, str):
+        textArgs = [textArgs]
+
+    line_edit.setText(",".join(textArgs))
+    return line_edit
+
+
 class SettingsDialog(QDialog):
     def __init__(self, settings: RunSettings, parent=None):
         super().__init__(parent)
 
         self.setWindowFlags(self.windowFlags() & ~qt.Qt.WindowContextHelpButtonHint)
 
-        self.doCloseSlicerAfterRunCheckBox = qt.QCheckBox()
-        self.doCloseSlicerAfterRunCheckBox.setToolTip("If checked, closes Slicer Window after test run is complete.")
-        self.doCloseSlicerAfterRunCheckBox.setChecked(settings.doCloseSlicerAfterRun)
+        self.doCloseSlicerAfterRunCheckBox = create_checkbox(
+            tooltip="If checked, closes Slicer Window after test run is complete.",
+            isChecked=settings.doCloseSlicerAfterRun
+        )
 
-        self.doUseMainWindowCheckBox = qt.QCheckBox()
-        self.doUseMainWindowCheckBox.setToolTip("If checked, launches tests in a Slicer with main window visbile.")
-        self.doUseMainWindowCheckBox.setChecked(settings.doUseMainWindow)
+        self.doUseMainWindowCheckBox = create_checkbox(
+            tooltip="If checked, launches tests in a Slicer with main window visbile.",
+            isChecked=settings.doUseMainWindow
+        )
 
-        self.doMinimizeMainWindowCheckBox = qt.QCheckBox()
-        self.doMinimizeMainWindowCheckBox.setToolTip("If checked, minimizes main window after it is launched.")
-        self.doMinimizeMainWindowCheckBox.setChecked(settings.doMinimizeMainWindow)
+        self.doMinimizeMainWindowCheckBox = create_checkbox(
+            tooltip="If checked, minimizes main window after it is launched.",
+            isChecked=settings.doMinimizeMainWindow
+        )
 
-        self.extraSlicerArgsLineEdit = qt.QLineEdit()
-        self.extraSlicerArgsLineEdit.setToolTip("Comma separated list of extra Slicer args to pass to run.")
-        self.extraSlicerArgsLineEdit.setPlaceholderText("--no-splash,--disable-modules,--ignore-slicerrc")
-        self.extraSlicerArgsLineEdit.setText(",".join(settings.extraSlicerArgs))
+        self.doRunCoverageCheckBox = create_checkbox(
+            tooltip=
+            "If checked, launches test coverage for given folder.\n"
+            "Coverage will use the local .coveragerc file if any is present.",
+            isChecked=settings.doRunCoverage
+        )
 
-        self.extraPytestArgsLineEdit = qt.QLineEdit()
-        self.extraPytestArgsLineEdit.setToolTip("Comma separated list of extra Pytest args to pass to run.")
-        self.extraPytestArgsLineEdit.setPlaceholderText("--collect-only,--maxfail=2")
-        self.extraPytestArgsLineEdit.setText(",".join(settings.extraPytestArgs))
+        self.extraSlicerArgsLineEdit = create_text_list_line_edit(
+            tooltip="Comma separated list of extra Slicer args to pass to run.",
+            placeholder="--no-splash,--disable-modules,--ignore-slicerrc",
+            textArgs=settings.extraSlicerArgs
+        )
+
+        self.extraPytestArgsLineEdit = create_text_list_line_edit(
+            tooltip="Comma separated list of extra Pytest args to pass to run.",
+            placeholder="--collect-only,--maxfail=2",
+            textArgs=settings.extraPytestArgs
+        )
+
+        self.coverageReportFormatsLineEdit = create_text_list_line_edit(
+            tooltip="Comma separated list of formats for the output reports.",
+            placeholder="html,xml,lcov",
+            textArgs=settings.coverageReportFormats
+        )
+
+        self.coverageSourcesLineEdit = create_text_list_line_edit(
+            tooltip="Comma separated list of source paths to scan for test coverage.",
+            placeholder="src,my_lib",
+            textArgs=settings.coverageSources,
+        )
+
+        self.coverageFilePathLineEdit = create_text_list_line_edit(
+            tooltip="File path to the report file to generate",
+            placeholder="my_report.xml",
+            textArgs=settings.coverageFilePath
+        )
 
         formLayout = qt.QFormLayout()
         formLayout.addRow("Close Slicer after run:", self.doCloseSlicerAfterRunCheckBox)
         formLayout.addRow("Use main Window:", self.doUseMainWindowCheckBox)
         formLayout.addRow("Minimize main Window:", self.doMinimizeMainWindowCheckBox)
+        formLayout.addRow(qt.QLabel(""))
         formLayout.addRow("Extra Slicer args:", self.extraSlicerArgsLineEdit)
         formLayout.addRow("Extra PyTest args:", self.extraPytestArgsLineEdit)
+        formLayout.addRow(qt.QLabel(""))
+        formLayout.addRow("Run test coverage:", self.doRunCoverageCheckBox)
+        formLayout.addRow("Coverage report formats:", self.coverageReportFormatsLineEdit)
+        formLayout.addRow("Coverage sources:", self.coverageSourcesLineEdit)
+        formLayout.addRow("Coverage path:", self.coverageFilePathLineEdit)
 
         self.okButton = qt.QPushButton("Ok")
         self.okButton.clicked.connect(self.onOkClicked)
@@ -67,6 +123,10 @@ class SettingsDialog(QDialog):
             doMinimizeMainWindow=self.doMinimizeMainWindowCheckBox.isChecked(),
             extraSlicerArgs=self.toList(self.extraSlicerArgsLineEdit.text),
             extraPytestArgs=self.toList(self.extraPytestArgsLineEdit.text),
+            doRunCoverage=self.doRunCoverageCheckBox.isChecked(),
+            coverageReportFormats=self.toList(self.coverageReportFormatsLineEdit.text),
+            coverageSources=self.toList(self.coverageSourcesLineEdit.text),
+            coverageFilePath=self.coverageFilePathLineEdit.text or None,
         )
 
     @classmethod
