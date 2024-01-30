@@ -6,7 +6,7 @@ project(SlicerPythonTestRunner)
 # Extension meta-information
 set(EXTENSION_HOMEPAGE "https://github.com/KitwareMedical/SlicerPythonTestRunner")
 set(EXTENSION_CATEGORY "Developer Tools")
-set(EXTENSION_CONTRIBUTORS "Thibault Pelletier (Kitware)")
+set(EXTENSION_CONTRIBUTORS "Thibault Pelletier (Kitware SAS)")
 set(EXTENSION_DESCRIPTION "This extension allows running 3D Slicer module's unit tests directly from 3D Slicer's UI")
 set(EXTENSION_ICONURL "https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/SlicerPythonTestRunner.png")
 set(EXTENSION_SCREENSHOTURLS "https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/0.png")

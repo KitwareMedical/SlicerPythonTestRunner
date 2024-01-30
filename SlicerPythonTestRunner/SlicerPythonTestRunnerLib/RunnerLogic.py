@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Tuple, Union
 
 from .TestCoverage import _coverage
-from .Decoractor import isRunningInSlicerGui
+from .Decorator import isRunningInSlicerGui
 from .Results import Results
 from .Settings import RunSettings
 

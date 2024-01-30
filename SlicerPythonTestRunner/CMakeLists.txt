@@ -6,7 +6,7 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
   SlicerPythonTestRunnerLib/__init__.py
   SlicerPythonTestRunnerLib/Case.py
-  SlicerPythonTestRunnerLib/Decoractor.py
+  SlicerPythonTestRunnerLib/Decorator.py
   SlicerPythonTestRunnerLib/EnsureRequirements.py
   SlicerPythonTestRunnerLib/IconPath.py
   SlicerPythonTestRunnerLib/LoadingWidget.py
@@ -17,13 +17,18 @@ set(MODULE_PYTHON_SCRIPTS
   SlicerPythonTestRunnerLib/Settings.py
   SlicerPythonTestRunnerLib/SettingsDialog.py
   SlicerPythonTestRunnerLib/Signal.py
+  SlicerPythonTestRunnerLib/TestCoverage.py
   SlicerPythonTestRunnerLib/TreeProxyModel.py
   SlicerPythonTestRunnerLib/TreeView.py
+  Testing/__init__.py
   Testing/a_test_results_file.json
+  Testing/a_test_results_file_with_collect_errors.json
   Testing/conftest.py
   Testing/test_runner_logic.py
   Testing/test_runner_widget.py
+  Testing/test_settings_dialog.py
   Testing/test_tree_view.py
+  Testing/utils.py
   )
 
 set(MODULE_PYTHON_RESOURCES
@@ -33,6 +38,7 @@ set(MODULE_PYTHON_RESOURCES
   Resources/Icons/test_collect_icon.png
   Resources/Icons/test_failed_icon.png
   Resources/Icons/test_loading.gif
+  Resources/Icons/test_module_settings_icon.png
   Resources/Icons/test_ok_icon.png
   Resources/Icons/test_skipped_icon.png
   Resources/Icons/test_start_icon.png
