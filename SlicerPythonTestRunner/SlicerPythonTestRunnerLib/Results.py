@@ -35,14 +35,26 @@ class Results:
         executedIds = {case.nodeid for case in executedCases}
 
         collectedCases = [
-            case_result
-            for collector in results_dict.get("collectors", [])
-            for case_result in collector.get("result", [])
-            if case_result.get("type", "") not in ["Module", "UnitTestCase"]
+            Case.fromCollectedTestDict(case) for case in
+            cls._extractCollectorResultsFromDict(results_dict)
         ]
-
-        collectedCases = [Case.fromCollectedTestDict(case) for case in collectedCases]
         return cls(testRoot, executedCases + [case for case in collectedCases if case.nodeid not in executedIds])
+
+    @staticmethod
+    def _extractCollectorResultsFromDict(results_dict):
+        collectedCases = []
+        for collector in results_dict.get("collectors", []):
+            if collector.get("outcome") == "failed":
+                collectedCases.append(collector)
+
+            for case_result in collector.get("result", []):
+                if case_result["nodeid"].endswith("__init__.py"):
+                    continue
+
+                if case_result.get("type", "") not in ["Module", "UnitTestCase"]:
+                    collectedCases.append(case_result)
+
+        return collectedCases
 
     def getAllCases(self) -> List[Case]:
         return deepcopy(self._testCases)

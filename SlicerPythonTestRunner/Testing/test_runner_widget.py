@@ -1,9 +1,8 @@
-from pathlib import Path
-
 import pytest
+import slicer
 
 from SlicerPythonTestRunnerLib import runTestInSlicerContext, RunnerWidget, RunSettings, SettingsDialog
-import slicer
+from Testing.utils import write_file, a_test_file_with_passing_failing_tests_content
 
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
@@ -24,13 +23,7 @@ def test_a_runner_widget_can_display_test_results_and_clicked_cases(a_json_test_
 
 @pytest.fixture
 def a_folder_with_tests(tmpdir):
-    with open(Path(tmpdir).joinpath("test_file.py"), "w") as f:
-        f.write(
-            "def test_pass():\n"
-            "  pass\n"
-            "def test_fail():\n"
-            "  assert False\n"
-        )
+    write_file(tmpdir, "test_file.py", a_test_file_with_passing_failing_tests_content())
     return tmpdir
 
 

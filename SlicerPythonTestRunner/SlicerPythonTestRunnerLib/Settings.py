@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import List, Optional, Dict
 import qt
 
+OptStringList = Optional[List[str]]
+
 
 class RunSettings:
     """
@@ -15,45 +17,34 @@ class RunSettings:
             doCloseSlicerAfterRun: bool = True,
             doUseMainWindow: bool = True,
             doMinimizeMainWindow: bool = True,
-            extraSlicerArgs: List[str] = None,
-            extraPytestArgs: List[str] = None,
+            extraSlicerArgs: OptStringList = None,
+            extraPytestArgs: OptStringList = None,
+            doRunCoverage: bool = False,
+            coverageReportFormats: OptStringList = None,
+            coverageSources: OptStringList = None,
+            coverageFilePath: Optional[str] = None
     ):
         self.doCloseSlicerAfterRun = doCloseSlicerAfterRun
         self.doUseMainWindow = doUseMainWindow
         self.doMinimizeMainWindow = doMinimizeMainWindow
-        self.extraSlicerArgs = extraSlicerArgs
-        self.extraPytestArgs = extraPytestArgs
+        self.extraSlicerArgs = self._toArgList(extraSlicerArgs)
+        self.extraPytestArgs = self._toArgList(extraPytestArgs)
+        self.doRunCoverage = doRunCoverage
+        self.coverageReportFormats = self._toArgList(coverageReportFormats)
 
-    @property
-    def extraSlicerArgs(self):
-        return self._extraSlicerArgs
-
-    @extraSlicerArgs.setter
-    def extraSlicerArgs(self, value):
-        self._extraSlicerArgs = self._toArgList(value)
-
-    @property
-    def extraPytestArgs(self):
-        return self._extraPytestArgs
-
-    @extraPytestArgs.setter
-    def extraPytestArgs(self, value):
-        self._extraPytestArgs = self._toArgList(value)
+        # Coverage sources and file paths are expected to be None if unset in coverage.py
+        # IF set, the values will override configuration file. Otherwise, the configuration file may be used.
+        self.coverageSources = self._toArgList(coverageSources) or None
+        self.coverageFilePath = coverageFilePath or None
 
     @staticmethod
-    def _toArgList(value: Optional[List[str]]) -> List[str]:
+    def _toArgList(value: OptStringList) -> List[str]:
         if not value:
             return []
         return [v for v in value if v]
 
     def asDict(self) -> Dict:
-        return {
-            "doCloseSlicerAfterRun": self.doCloseSlicerAfterRun,
-            "doUseMainWindow": self.doUseMainWindow,
-            "doMinimizeMainWindow": self.doMinimizeMainWindow,
-            "extraSlicerArgs": self.extraSlicerArgs,
-            "extraPytestArgs": self.extraPytestArgs,
-        }
+        return {k: v for k, v in vars(self).items() if not k.startswith("_")}
 
     def toJson(self) -> str:
         return json.dumps(self.asDict())
@@ -76,12 +67,11 @@ class RunSettings:
         return cls._pytestFilterArgs("python_files", filePattern)
 
     @classmethod
-    def pytestClassFilterArgs(cls, classPattern: str) -> List[str]:
-        return cls._pytestFilterArgs("python_classes", classPattern)
+    def pytestPatternFilterArgs(cls, functionPattern: str) -> List[str]:
+        if not functionPattern:
+            return []
 
-    @classmethod
-    def pytestFunctionFilterArgs(cls, functionPattern: str) -> List[str]:
-        return cls._pytestFilterArgs("python_functions", functionPattern)
+        return ["-k", functionPattern]
 
     @classmethod
     def _pytestFilterArgs(cls, filterName: str, filterPattern: str) -> List[str]:
@@ -133,14 +123,6 @@ class ModuleSettings:
     @lastFilePattern.setter
     def lastFilePattern(self, value):
         self._setSetting("lastFilePattern", value)
-
-    @property
-    def lastClassPattern(self):
-        return self._getSetting("lastClassPattern", "")
-
-    @lastClassPattern.setter
-    def lastClassPattern(self, value):
-        self._setSetting("lastClassPattern", value)
 
     @property
     def lastFunctionPattern(self):

@@ -131,7 +131,12 @@ class Case:
 
     @classmethod
     def fromCollectedTestDict(cls, case: Dict) -> "Case":
-        return cls(outcome=Outcome.collected, nodeid=case["nodeid"])
+        try:
+            outcome = Outcome[case.get("outcome", "collected")]
+        except KeyError:
+            outcome = Outcome.unknown
+
+        return cls(outcome=outcome, nodeid=case["nodeid"], message=case.get("longrepr", ""))
 
     def getDebugString(self) -> str:
         status_msg = f"\n{self.message}" if self.message else ""

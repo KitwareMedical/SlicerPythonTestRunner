@@ -42,13 +42,12 @@ class RunnerWidget(QWidget):
         self.filePatternLineEdit.setPlaceholderText("test_*.py")
         self.filePatternLineEdit.setToolTip("Filter test files matching this pattern.")
 
-        self.classPatternLineEdit = qt.QLineEdit(self)
-        self.classPatternLineEdit.setPlaceholderText("*TestCase")
-        self.classPatternLineEdit.setToolTip("Filter test classes matching this pattern.")
-
         self.functionPatternLineEdit = qt.QLineEdit(self)
-        self.functionPatternLineEdit.setPlaceholderText("test_*")
-        self.functionPatternLineEdit.setToolTip("Filter test functions matching this pattern.")
+        self.functionPatternLineEdit.setPlaceholderText("test_ and not test_2")
+        self.functionPatternLineEdit.setToolTip(
+            "Filter patterns matching input (including classes and functions).\n"
+            "Uses pytest's -k filtering option."
+        )
 
         self.treeView = TreeView(self)
         self.logic = RunnerLogic()
@@ -106,7 +105,6 @@ class RunnerWidget(QWidget):
 
         filePatternLayout = qt.QHBoxLayout()
         filePatternLayout.addWidget(self.filePatternLineEdit)
-        filePatternLayout.addWidget(self.classPatternLineEdit)
         filePatternLayout.addWidget(self.functionPatternLineEdit)
 
         self.testResultTextEdit = qt.QTextEdit()
@@ -129,7 +127,6 @@ class RunnerWidget(QWidget):
         settings = ModuleSettings()
         self.dirPathLineEdit.currentPath = settings.lastPath
         self.filePatternLineEdit.setText(settings.lastFilePattern)
-        self.classPatternLineEdit.setText(settings.lastClassPattern)
         self.functionPatternLineEdit.setText(settings.lastFunctionPattern)
         showIgnoredButton.setChecked(settings.showIgnoredChecked)
         showPassedButton.setChecked(settings.showPassedChecked)
@@ -142,7 +139,6 @@ class RunnerWidget(QWidget):
         settings = ModuleSettings()
         settings.lastPath = self.dirPathLineEdit.currentPath
         settings.lastFilePattern = self.filePatternLineEdit.text
-        settings.lastClassPattern = self.classPatternLineEdit.text
         settings.lastFunctionPattern = self.functionPatternLineEdit.text
 
     def onRunTests(self):
@@ -164,8 +160,7 @@ class RunnerWidget(QWidget):
 
         runSettings = ModuleSettings().lastRunSettings
         runSettings.extraPytestArgs += [
-            *RunSettings.pytestClassFilterArgs(self.classPatternLineEdit.text),
-            *RunSettings.pytestFunctionFilterArgs(self.functionPatternLineEdit.text),
+            *RunSettings.pytestPatternFilterArgs(self.functionPatternLineEdit.text),
             *RunSettings.pytestFileFilterArgs(self.filePatternLineEdit.text)
         ]
         if not doCollectOnly:

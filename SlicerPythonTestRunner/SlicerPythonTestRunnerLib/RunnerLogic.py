@@ -4,8 +4,9 @@ import tempfile
 from pathlib import Path
 from typing import List, Tuple, Union
 
-from .Results import Results
+from .TestCoverage import _coverage
 from .Decoractor import isRunningInSlicerGui
+from .Results import Results
 from .Settings import RunSettings
 
 
@@ -118,7 +119,11 @@ class RunnerLogic:
         except ImportError:
             exit_f = sys.exit
 
-        ret = cls.runPyTest(path, json_report_path, runSettings.extraPytestArgs)
+        @_coverage(runSettings)
+        def runPyTestWithCoverage():
+            return cls.runPyTest(path, json_report_path, runSettings.extraPytestArgs)
+
+        ret = runPyTestWithCoverage()
         if runSettings.doCloseSlicerAfterRun:
             exit_f(ret)
         return ret

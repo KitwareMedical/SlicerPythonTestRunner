@@ -1,0 +1,59 @@
+{
+  "created": 1706598688.36601,
+  "duration": 0.13850998878479004,
+  "exitcode": 2,
+  "root": "C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-97\\test_runner_reports_collect_er0",
+  "environment": {},
+  "summary": {
+    "total": 0,
+    "collected": 0
+  },
+  "collectors": [
+    {
+      "nodeid": "",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "pck/__init__.py",
+          "type": "Package"
+        },
+        {
+          "nodeid": "tests/__init__.py",
+          "type": "Package"
+        }
+      ]
+    },
+    {
+      "nodeid": "pck/__init__.py",
+      "outcome": "passed",
+      "result": []
+    },
+    {
+      "nodeid": "tests/test_1.py",
+      "outcome": "failed",
+      "result": [],
+      "longrepr": "ImportError while importing test module 'C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-97\\test_runner_reports_collect_er0\\tests\\test_1.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\slicer.org\\Slicer 5.4.0\\lib\\Python\\Lib\\importlib\\__init__.py:127: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests\\test_1.py:1: in <module>\n    from pck.s1 import f_a\npck\\s1.py:1: in <module>\n    from .s2 import f_b\npck\\s2.py:1: in <module>\n    from .s1 import f_a\nE   ImportError: cannot import name 'f_a' from partially initialized module 'pck.s1' (most likely due to a circular import) (C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-97\\test_runner_reports_collect_er0\\pck\\s1.py)"
+    },
+    {
+      "nodeid": "tests/test_2.py",
+      "outcome": "failed",
+      "result": [],
+      "longrepr": "ImportError while importing test module 'C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-97\\test_runner_reports_collect_er0\\tests\\test_2.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\slicer.org\\Slicer 5.4.0\\lib\\Python\\Lib\\importlib\\__init__.py:127: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests\\test_2.py:1: in <module>\n    from pck.s2 import f_b\npck\\s2.py:1: in <module>\n    from .s1 import f_a\npck\\s1.py:1: in <module>\n    from .s2 import f_b\nE   ImportError: cannot import name 'f_b' from partially initialized module 'pck.s2' (most likely due to a circular import) (C:\\Users\\Thibault\\AppData\\Local\\Temp\\pytest-of-Thibault\\pytest-97\\test_runner_reports_collect_er0\\pck\\s2.py)"
+    },
+    {
+      "nodeid": "tests/__init__.py",
+      "outcome": "passed",
+      "result": [
+        {
+          "nodeid": "tests/test_1.py",
+          "type": "Module"
+        },
+        {
+          "nodeid": "tests/test_2.py",
+          "type": "Module"
+        }
+      ]
+    }
+  ],
+  "tests": []
+}

@@ -46,7 +46,7 @@ def runTestInSlicerContext(runSettings: RunSettings = None):
                         doMinimizeMainWindow=runSettings.doMinimizeMainWindow,
                         extraPytestArgs=[
                             *RunSettings.pytestFileFilterArgs(wrappedFile.name),
-                            *RunSettings.pytestFunctionFilterArgs(f.__name__),
+                            *RunSettings.pytestPatternFilterArgs(f.__name__),
                             *runSettings.extraPytestArgs
                         ],
                         extraSlicerArgs=runSettings.extraSlicerArgs
