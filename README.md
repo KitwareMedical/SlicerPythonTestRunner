@@ -1,6 +1,8 @@
 # Slicer Python Test Runner
 
-<img src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/0.png"/>
+<div style="text-align: center;">
+<img src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/SlicerPythonTestRunner.png"/>
+</div>
 
 ## Table of contents
 
@@ -13,9 +15,7 @@
 
 ## Introduction
 
-<div style="text-align:center">
-<img class="center" src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/SlicerPythonTestRunner.png"/>
-</div>
+<img src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/0.png"/>
 
 This module allows running 3D Slicer module's unit tests directly from 3D Slicer's UI.
 
@@ -59,17 +59,17 @@ for `Slicer Python Test Runner`.
 
 You will see the following, empty, test runner module:
 
-<img class="center" src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/2.png"/>
+<img class="center" src="https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/1.png"/>
 
 Start by selecting the directory containing the tests using the top path selector.
-Then enter the file filter pattern, test class filter pattern, and test function filter pattern.
+Then enter the file filter pattern, and name filter pattern.
+`Note`: The function filter will be applied when running the tests but not during test collection.
 
 *Warning* : Note that by default, the module uses PyTest's conventions which expects test files, classes and functions
 to be prefixed by `test`.
 
 If you are testing using 3D Slicer convention, please use the following pattern:
 * file : *.py
-* class : *TestCase
 
 Click on the `collect` button to check that the tests to run are correctly found by the extension.
 
@@ -104,6 +104,14 @@ The following settings are accessible:
 * Minimize main window: If checked and a main window is used, minimizes the launched window at startup
 * Extra slicer args: Comma separated list of args to use when starting Slicer instance (refer to Slicer launcher CLI args for more info)
 * Extra pytest args: Comma separated list of args to pass to PyTest (please refer to PyTest args for more info)
+* Run test coverage: If checked, test coverage will be executed on the tests which are ran
+* Coverage report format: Comma separated list of coverage formats. For now only one format should be used from the UI.
+    If you want to output more coverage files, it is recommended to use coverage settings file in your project.
+* Coverage source: Comma separated list of sources folders to include in the coverage report.
+* Coverage path: Output file or directory path where the coverage report will be put.
+
+The test module is also compatible with `pytest.ini` and `.coveragerc` settings files.
+It should also be compatible with other settings files in your project to ease the configuration process.
 
 
 ## Test decorators
