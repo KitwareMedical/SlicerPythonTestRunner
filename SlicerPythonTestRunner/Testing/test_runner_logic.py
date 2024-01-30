@@ -69,6 +69,21 @@ def test_runner_tests_can_be_parsed(a_json_test_result_file):
         assert False, res.getFailingCasesString()
 
 
+def test_runner_tests_with_collect_errors_can_be_parsed(a_json_test_with_collect_errors_result_file):
+    res = Results.fromReportFile(a_json_test_with_collect_errors_result_file)
+    assert res.failuresNumber == 2
+
+    assert len(res.getFailingCases()) == 2
+
+    with pytest.raises(AssertionError):
+        assert False, res.getFailingCasesString()
+
+
+def test_runner_results_ignore_init_file_collection(a_json_test_with_collect_errors_result_file):
+    res = Results.fromReportFile(a_json_test_with_collect_errors_result_file)
+    assert res.collectedNumber == 0
+
+
 @pytest.fixture()
 def a_reporting_failing_test_file(tmpdir):
     file_path = Path(tmpdir).joinpath("test_failing_file.py")
@@ -271,7 +286,11 @@ def a_test_case_with_two_tests(tmpdir):
     return write_file(tmpdir, "test_testcase_with_two_tests.py", content)
 
 
-def test_runner_filter_function_can_run_specific_function_from_test_class(tmpdir, a_test_case_with_two_tests, a_test_runner):
+def test_runner_filter_function_can_run_specific_function_from_test_class(
+        tmpdir,
+        a_test_case_with_two_tests,
+        a_test_runner
+):
     res = a_test_runner.runAndWaitFinished(
         tmpdir,
         RunSettings(
@@ -284,3 +303,42 @@ def test_runner_filter_function_can_run_specific_function_from_test_class(tmpdir
 
     assert res.executedNumber == 1
     assert res.passedNumber == 1
+
+
+@pytest.fixture
+def a_dir_with_collect_problems(tmpdir):
+    s1 = (
+        "from .s2 import f_b\n"
+        "def f_a():\n"
+        "  pass\n"
+    )
+    s2 = (
+        "from .s1 import f_a\n"
+        "def f_b():\n"
+        "  pass\n"
+    )
+    t1 = (
+        "from pck.s1 import f_a\n"
+        "def test_1():\n"
+        "  pass\n"
+    )
+
+    t2 = (
+        "from pck.s2 import f_b\n"
+        "def test_2():\n"
+        "  pass\n"
+    )
+
+    write_file(tmpdir, "pck/__init__.py", "")
+    write_file(tmpdir, "pck/s1.py", s1)
+    write_file(tmpdir, "pck/s2.py", s2)
+    write_file(tmpdir, "tests/__init__.py", "")
+    write_file(tmpdir, "tests/test_1.py", t1)
+    write_file(tmpdir, "tests/test_2.py", t2)
+
+    return tmpdir
+
+
+def test_runner_reports_collect_errors(a_dir_with_collect_problems, a_test_runner):
+    res = a_test_runner.runAndWaitFinished(a_dir_with_collect_problems, RunSettings(doUseMainWindow=False))
+    assert res.failuresNumber == 2
