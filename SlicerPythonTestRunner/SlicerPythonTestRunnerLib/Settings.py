@@ -67,12 +67,11 @@ class RunSettings:
         return cls._pytestFilterArgs("python_files", filePattern)
 
     @classmethod
-    def pytestClassFilterArgs(cls, classPattern: str) -> List[str]:
-        return cls._pytestFilterArgs("python_classes", classPattern)
+    def pytestPatternFilterArgs(cls, functionPattern: str) -> List[str]:
+        if not functionPattern:
+            return []
 
-    @classmethod
-    def pytestFunctionFilterArgs(cls, functionPattern: str) -> List[str]:
-        return cls._pytestFilterArgs("python_functions", functionPattern)
+        return ["-k", functionPattern]
 
     @classmethod
     def _pytestFilterArgs(cls, filterName: str, filterPattern: str) -> List[str]:
@@ -124,14 +123,6 @@ class ModuleSettings:
     @lastFilePattern.setter
     def lastFilePattern(self, value):
         self._setSetting("lastFilePattern", value)
-
-    @property
-    def lastClassPattern(self):
-        return self._getSetting("lastClassPattern", "")
-
-    @lastClassPattern.setter
-    def lastClassPattern(self, value):
-        self._setSetting("lastClassPattern", value)
 
     @property
     def lastFunctionPattern(self):

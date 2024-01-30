@@ -98,7 +98,7 @@ def a_unittest_case_file(tmpdir):
 def test_runner_can_run_unittest_test_case_files(a_test_runner, a_unittest_case_file, tmpdir):
     res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(
         doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestClassFilterArgs("*TestCase") + RunSettings.pytestFileFilterArgs("*.py")
+        extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py")
     ))
     assert res.executedNumber == 2
     assert res.failuresNumber == 1
@@ -108,7 +108,7 @@ def test_runner_can_run_unittest_test_case_files(a_test_runner, a_unittest_case_
 def test_runner_can_collect_unittest_test_case_files(a_test_runner, a_unittest_case_file, tmpdir):
     res = a_test_runner.collectSubProcess(tmpdir, RunSettings(
         doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestClassFilterArgs("*TestCase") + RunSettings.pytestFileFilterArgs("*.py")
+        extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py")
     ))
     assert res.executedNumber == 0
     assert res.collectedNumber == 2
@@ -117,7 +117,7 @@ def test_runner_can_collect_unittest_test_case_files(a_test_runner, a_unittest_c
 def test_runner_can_filter_function_names(a_test_runner, a_succeeding_test_file_with_two_tests, tmpdir):
     res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(
         doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestFunctionFilterArgs("*_2")
+        extraPytestArgs=RunSettings.pytestPatternFilterArgs("_2")
     ))
     assert res.executedNumber == 1
     assert res.passedNumber == 1
@@ -255,3 +255,32 @@ def test_runner_uses_local_config_files_if_present_in_the_run_dir(
     report_path = Path(tmpdir).joinpath("coverage_html_report")
     assert report_path.exists()
     assert report_path.joinpath("index.html").exists()
+
+
+@pytest.fixture
+def a_test_case_with_two_tests(tmpdir):
+    content = (
+        "import unittest\n\n"
+        "class MyTestCase(unittest.TestCase):\n\n"
+        "  def test_1(self):\n"
+        "    pass\n\n"
+        "  def test_2(self):\n"
+        "    pass\n"
+    )
+
+    return write_file(tmpdir, "test_testcase_with_two_tests.py", content)
+
+
+def test_runner_filter_function_can_run_specific_function_from_test_class(tmpdir, a_test_case_with_two_tests, a_test_runner):
+    res = a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=
+            RunSettings.pytestFileFilterArgs("*.py") +
+            RunSettings.pytestPatternFilterArgs("test_1")
+        )
+    )
+
+    assert res.executedNumber == 1
+    assert res.passedNumber == 1
