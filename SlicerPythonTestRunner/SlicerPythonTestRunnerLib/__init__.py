@@ -10,4 +10,4 @@ from .Results import Results
 from .RunnerLogic import RunnerLogic
 from .TreeView import TreeView
 from .RunnerWidget import RunnerWidget
-from .Decoractor import runTestInSlicerContext, skipTestOutsideSlicer, isRunningInSlicerGui
+from .Decorator import runTestInSlicerContext, skipTestOutsideSlicer, isRunningInSlicerGui
