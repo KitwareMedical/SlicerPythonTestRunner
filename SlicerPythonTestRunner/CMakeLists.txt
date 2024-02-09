@@ -21,8 +21,6 @@ set(MODULE_PYTHON_SCRIPTS
   SlicerPythonTestRunnerLib/TreeProxyModel.py
   SlicerPythonTestRunnerLib/TreeView.py
   Testing/__init__.py
-  Testing/a_test_results_file.json
-  Testing/a_test_results_file_with_collect_errors.json
   Testing/conftest.py
   Testing/test_runner_logic.py
   Testing/test_runner_widget.py
@@ -43,6 +41,8 @@ set(MODULE_PYTHON_RESOURCES
   Resources/Icons/test_skipped_icon.png
   Resources/Icons/test_start_icon.png
   Resources/Icons/test_stop_icon.png
+  Testing/a_test_results_file.json
+  Testing/a_test_results_file_with_collect_errors.json
   )
 
 #-----------------------------------------------------------------------------
