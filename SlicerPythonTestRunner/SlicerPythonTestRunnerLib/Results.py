@@ -51,7 +51,7 @@ class Results:
                 if case_result["nodeid"].endswith("__init__.py"):
                     continue
 
-                if case_result.get("type", "") not in ["Module", "UnitTestCase"]:
+                if "function" in case_result.get("type", "").lower():
                     collectedCases.append(case_result)
 
         return collectedCases
