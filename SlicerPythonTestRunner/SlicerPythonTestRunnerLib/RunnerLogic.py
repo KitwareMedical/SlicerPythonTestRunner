@@ -23,9 +23,11 @@ class RunnerLogic:
 
     @staticmethod
     def default_path() -> Path:
-        return next(
-            file for file in Path(sys.executable).joinpath("..", "..").resolve().glob("Slicer*") if file.is_file()
-        ).resolve()
+        if isRunningInSlicerGui():
+            import slicer
+            return Path(slicer.app.applicationFilePath())
+
+        return next(file for file in Path(sys.executable).parent.glob("SlicerApp*") if file.is_file()).resolve()
 
     @staticmethod
     def startQProcess(process: "qt.QProcess", args) -> None:
