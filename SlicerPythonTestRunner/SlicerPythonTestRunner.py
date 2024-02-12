@@ -17,7 +17,7 @@ class SlicerPythonTestRunner(ScriptedLoadableModule):
         self.parent.title = "Slicer Python Test Runner"
         self.parent.categories = ["Developer Tools"]
         self.parent.dependencies = []
-        self.parent.contributors = ["Thibault Pelletier (Kitware)"]
+        self.parent.contributors = ["Thibault Pelletier (Kitware SAS)"]
         self.parent.helpText = (
             "This module allows running 3D Slicer module's unit tests directly from 3D Slicer's UI.<br><br>"
             "It uses PyTest to discover the unit tests in a given directory or file and runs the tests in a separate "
@@ -27,7 +27,10 @@ class SlicerPythonTestRunner(ScriptedLoadableModule):
             'Learn more on our <a href="https://github.com/KitwareMedical/SlicerPythonTestRunner">'
             'github page</a>'
         )
-        self.parent.acknowledgementText = ""
+        self.parent.acknowledgementText = (
+            "This module was originally developed by Kitware SAS in order to help improve " 
+            "Slicer modules and Slicer based applications code quality."
+        )
 
 
 class SlicerPythonTestRunnerWidget(ScriptedLoadableModuleWidget):
