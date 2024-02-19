@@ -6,9 +6,9 @@ follow [Slicer's contributing documentation](https://github.com/Slicer/Slicer/bl
 To contribute, you can :
 
 * Ask a question on the [Slicer forum](https://discourse.slicer.org)
-* Use [Issues](https://github.com/R-Vessel-X/SlicerRVXLiverSegmentation/issues) to submit a feature request or bug, or
+* Use [Issues](https://github.com/KitwareMedical/SlicerPythonTestRunner/issues) to submit a feature request or bug, or
   add to the discussion on an existing issue
-* Submit a [Pull Request](https://github.com/R-Vessel-X/SlicerRVXLiverSegmentation/pulls) to improve this plugin or its
+* Submit a [Pull Request](https://github.com/KitwareMedical/SlicerPythonTestRunner/pulls) to improve this plugin or its
   documentation
 
 We encourage a range of Pull Requests, from patches that include passing tests and documentation, all the way down to
@@ -24,7 +24,7 @@ If you are new to Slicer plugin development and you don't have push access to th
 1. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the repository.
 2. Create a branch.
 3. [Push](https://help.github.com/articles/pushing-to-a-remote/) the branch to your GitHub fork.
-4. Create a [Pull Request](https://github.com/R-Vessel-X/SlicerRVXLiverSegmentation/pulls).
+4. Create a [Pull Request](https://github.com/KitwareMedical/SlicerPythonTestRunner/pulls).
 
 This corresponds to the `Fork & Pull Model` mentioned in
 the [GitHub flow](https://guides.github.com/introduction/flow/index.html)
@@ -38,7 +38,7 @@ reviewers, you may have to revisit your patches.
 
 This plugin follows Slicer's commit message standard :
 
-* `BUG:` Fix for runtime crash or incorrect result
+* `FIX:` Fix for runtime crash or incorrect result
 * `COMP:` Compiler error or warning fix
 * `DOC:` Documentation change
 * `ENH:` New functionality
@@ -55,7 +55,7 @@ following guidelines:
 2. Try to keep the subject line below 72 characters, ideally 50.
 3. Capitalize the subject line.
 4. Do not end the subject line with a period.
-5. Use the imperative mood in the subject line (e.g. `BUG: Fix spacing not being considered.`).
+5. Use the imperative mood in the subject line (e.g. `FIX: Fix spacing not being considered.`).
 6. Wrap the body at 80 characters.
 7. Use semantic line feeds to separate different ideas, which improves the readability.
 8. Be concise, but honor the change: if significant alternative solutions were available, explain why they were
@@ -73,9 +73,9 @@ post.
 
 Examples:
 
-- Bad: `BUG: Check pointer validity before dereferencing` -> implementation detail, self-explanatory (by looking at the
+- Bad: `FIX: Check pointer validity before dereferencing` -> implementation detail, self-explanatory (by looking at the
   code)
-- Good: `BUG: Fix crash in Module X when clicking Apply button`
+- Good: `FIX: Fix crash in Module X when clicking Apply button`
 - Bad: `ENH: More work in qSlicerXModuleWidget` -> more work is too vague, qSlicerXModuleWidget is too low level
 - Good: `ENH: Add float image outputs in module X`
 - Bad: `COMP: Typo in cmake variable` -> implementation detail, self-explanatory
