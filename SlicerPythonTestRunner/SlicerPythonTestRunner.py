@@ -61,9 +61,9 @@ class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
         results = RunnerLogic().runAndWaitFinished(currentDirTest, RunSettings(doUseMainWindow=False))
 
         if results.failuresNumber:
-            slicer.util.errorDisplay(f"Test failed :\n{results.getFailingCasesString()}")
+            raise AssertionError(f"Test failed :\n{results.getFailingCasesString()}")
         else:
-            slicer.util.delayDisplay("Test OK")
+            slicer.util.delayDisplay(f"Test OK : {results.getSummaryString()}")
 
     def runTest(self):
         """Run as few or as many tests as needed here.

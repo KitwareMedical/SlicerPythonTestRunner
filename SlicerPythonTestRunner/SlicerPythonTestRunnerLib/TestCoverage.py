@@ -3,8 +3,6 @@ from functools import wraps, partial
 from pathlib import Path
 from typing import List, Set
 
-from coverage import Coverage
-
 
 def get_all_cov_formats():
     return ["json", "xml", "lcov", "html"]
@@ -16,7 +14,7 @@ def get_coverage_formats_from_list(reportFormats: List[str]) -> Set[str]:
     }
 
 
-def get_coverage_formats_from_conf(cov: Coverage) -> Set[str]:
+def get_coverage_formats_from_conf(cov: "Coverage") -> Set[str]:
     config = cov.config.config_file
     if not config or not Path(config).is_file():
         return set()
@@ -32,7 +30,7 @@ def get_coverage_formats_from_conf(cov: Coverage) -> Set[str]:
         return set()
 
 
-def get_coverage_formats(cov: Coverage, reportFormats: List[str]) -> List[str]:
+def get_coverage_formats(cov: "Coverage", reportFormats: List[str]) -> List[str]:
     report_formats = get_coverage_formats_from_list(reportFormats)
     config_formats = get_coverage_formats_from_conf(cov)
     return list(report_formats.union(config_formats))
@@ -42,6 +40,7 @@ def _coverage(runSettings):
     def wrapper(f):
         @wraps(f)
         def decorator(*args, **kwargs):
+            from coverage import Coverage
             if not runSettings.doRunCoverage:
                 return f(*args, **kwargs)
 

@@ -1,4 +1,4 @@
-from .EnsureRequirements import _ensureRequirements
+from .EnsureRequirements import ensureRequirements
 from .IconPath import iconPath, icon
 from .Signal import Signal
 from .QWidget import QWidget

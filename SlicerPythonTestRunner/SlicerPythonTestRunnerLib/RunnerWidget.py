@@ -4,12 +4,12 @@ from typing import Optional
 import qt
 import slicer
 
-from . import RunSettings
+from .EnsureRequirements import ensureRequirements
 from .IconPath import icon
 from .QWidget import QWidget
 from .Results import Results
 from .RunnerLogic import RunnerLogic
-from .Settings import ModuleSettings
+from .Settings import ModuleSettings, RunSettings
 from .SettingsDialog import SettingsDialog
 from .TreeView import TreeView
 
@@ -157,6 +157,16 @@ class RunnerWidget(QWidget):
         self.testResultTextEdit.clear()
         self.treeView.clear()
         self.treeView.setCurrentWidgetToLoading()
+        slicer.app.processEvents()
+
+        # Install pytest requirements if needed
+        try:
+            ensureRequirements()
+        except Exception: # noqa
+            import traceback
+            slicer.util.errorDisplay("Failed to install module dependencies", detailedText=traceback.format_exc())
+            self.onProcessFinished()
+            return
 
         runSettings = ModuleSettings().lastRunSettings
         runSettings.extraPytestArgs += [
