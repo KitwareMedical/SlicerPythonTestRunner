@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import tempfile
+import traceback
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -123,7 +124,11 @@ class RunnerLogic:
 
         @_coverage(runSettings)
         def runPyTestWithCoverage():
-            return cls.runPyTest(path, json_report_path, runSettings.extraPytestArgs)
+            try:
+                return cls.runPyTest(path, json_report_path, runSettings.extraPytestArgs)
+            except Exception as e:  # noqa
+                traceback.print_exc()
+                return 1
 
         ret = runPyTestWithCoverage()
         if runSettings.doCloseSlicerAfterRun:

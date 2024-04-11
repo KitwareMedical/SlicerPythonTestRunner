@@ -2,8 +2,6 @@ import sys
 from functools import wraps
 from pathlib import Path
 
-import pytest
-
 from .Settings import RunSettings
 
 
@@ -63,6 +61,7 @@ def runTestInSlicerContext(runSettings: RunSettings = None):
 
 
 def skipTestOutsideSlicer(f):
+    import pytest
     if not isRunningInSlicerGui():
         pytest.skip(f"Skipping test executed outside Slicer GUI : {f.__name__}")
     return f
