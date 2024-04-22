@@ -7,7 +7,7 @@ project(SlicerPythonTestRunner)
 set(EXTENSION_HOMEPAGE "https://github.com/KitwareMedical/SlicerPythonTestRunner")
 set(EXTENSION_CATEGORY "Developer Tools")
 set(EXTENSION_CONTRIBUTORS "Thibault Pelletier (Kitware SAS)")
-set(EXTENSION_DESCRIPTION "This extension allows running 3D Slicer module's unit tests directly from 3D Slicer's UI")
+set(EXTENSION_DESCRIPTION "This extension allows to run Slicer's Python tests directly from Slicer by leveraging PyTest and PyTest-json-report librairies. The tests are executed in a new Slicer process to avoid outdated package import problems.")
 set(EXTENSION_ICONURL "https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/SlicerPythonTestRunner.png")
 set(EXTENSION_SCREENSHOTURLS "https://github.com/KitwareMedical/SlicerPythonTestRunner/raw/main/Screenshots/0.png")
 set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
