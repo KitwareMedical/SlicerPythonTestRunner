@@ -342,3 +342,19 @@ def a_dir_with_collect_problems(tmpdir):
 def test_runner_reports_collect_errors(a_dir_with_collect_problems, a_test_runner):
     res = a_test_runner.runAndWaitFinished(a_dir_with_collect_problems, RunSettings(doUseMainWindow=False))
     assert res.failuresNumber == 2
+
+
+def test_runner_can_be_run_in_local_python(a_test_runner, a_test_case_with_two_tests, tmpdir):
+    res = a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=
+            RunSettings.pytestFileFilterArgs("*.py") +
+            RunSettings.pytestPatternFilterArgs("test_1")
+        ),
+        doRunInSubProcess=False
+    )
+
+    assert res.executedNumber == 1
+    assert res.passedNumber == 1

@@ -16,6 +16,17 @@ def isRunningInSlicerGui() -> bool:
         return False
 
 
+def isRunningInTestMode() -> bool:
+    """
+    Returns True is Slicer is running in test mode (CI). False otherwise.
+    """
+    try:
+        import slicer
+        return slicer.app.testingEnabled()
+    except (ImportError, AttributeError):
+        return False
+
+
 def runTestInSlicerContext(runSettings: RunSettings = None):
     """
     Decorator which allows running the unit test using the SlicerPythonTestRunnerLib if executed using a Slicer Python
