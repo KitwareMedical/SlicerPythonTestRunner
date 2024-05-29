@@ -2,11 +2,12 @@ import subprocess
 import sys
 import tempfile
 import traceback
+from copy import deepcopy
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 from .TestCoverage import _coverage
-from .Decorator import isRunningInSlicerGui
+from .Decorator import isRunningInSlicerGui, isRunningInTestMode
 from .Results import Results
 from .Settings import RunSettings
 
@@ -44,15 +45,42 @@ class RunnerLogic:
         else:
             subprocess.run(args)
 
-    def runAndWaitFinished(self, directory: Union[str, Path], runSettings: RunSettings) -> Results:
-        return self._runSubProcessAndParseResults(
-            *self.prepareRun(directory, runSettings)
-        )
+    def runAndWaitFinished(
+            self,
+            directory: Union[str, Path],
+            runSettings: RunSettings,
+            doRunInSubProcess: Optional[bool] = None
+    ) -> Results:
+        """
+        Run the tests given the input settings, wait for the results and returns the results.
+
+        :param directory: Directory in which PyTest will be executed
+        :param runSettings: Test settings
+        :param doRunInSubProcess: If None, will run in subprocess if not in Testing mode by default.
+            If True, runs in subprocess, otherwise, runs in current Python instance.
+            If running in Python instance, the libraries will be loaded once and not reloaded afterward.
+            Please use with caution.
+        """
+        if doRunInSubProcess is None:
+            doRunInSubProcess = not isRunningInTestMode()
+
+        if doRunInSubProcess:
+            return self._runSubProcessAndParseResults(*self.prepareRun(directory, runSettings))
+        else:
+            return self._runInLocalPythonAndParseResults(directory, runSettings)
 
     @classmethod
     def _runSubProcessAndParseResults(cls, args: List[str], jsonResportPath: Path) -> Results:
         cls._runInSubProcessAndWaitFinished(args)
         return Results.fromReportFile(jsonResportPath)
+
+    def _runInLocalPythonAndParseResults(self, directory, runSettings) -> Results:
+        runSettings = deepcopy(runSettings)
+        runSettings.doCloseSlicerAfterRun = False
+        runSettings.doMinimizeMainWindow = False
+        _, json_report_path = self._createTestPythonFile(directory, runSettings)
+        self.runPytestAndExit(directory, json_report_path, runSettings)
+        return Results.fromReportFile(json_report_path)
 
     def collectSubProcess(self, directory: Union[str, Path], runSettings: RunSettings) -> Results:
         """
@@ -118,8 +146,8 @@ class RunnerLogic:
             win = slicer.util.mainWindow()
             if win and runSettings.doMinimizeMainWindow:
                 win.showMinimized()
-            exit_f = slicer.app.exit
-        except ImportError:
+            exit_f = slicer.util.exit
+        except (ImportError, AttributeError):
             exit_f = sys.exit
 
         @_coverage(runSettings)
