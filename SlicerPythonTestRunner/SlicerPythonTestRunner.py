@@ -46,14 +46,9 @@ class SlicerPythonTestRunnerWidget(ScriptedLoadableModuleWidget):
 
 
 class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
-    """
-    This is the test case for your scripted module.
-    Uses ScriptedLoadableModuleTest base class, available at:
-    https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
-    """
-
-    def setUp(self):
-        """ Do whatever is needed to reset the state - typically a scene clear will be enough.
+    def runTest(self):
+        """
+        Clear scene and run every test in the Testing folder
         """
         slicer.mrmlScene.Clear()
 
@@ -62,10 +57,7 @@ class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
 
         if results.failuresNumber:
             raise AssertionError(f"Test failed :\n{results.getFailingCasesString()}")
-        else:
-            slicer.util.delayDisplay(f"Test OK : {results.getSummaryString()}")
 
-    def runTest(self):
-        """Run as few or as many tests as needed here.
-        """
-        self.setUp()
+        ok_msg = f"Test OK : {results.getSummaryString()}"
+        print(ok_msg)
+        slicer.util.delayDisplay(ok_msg)
