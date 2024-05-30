@@ -6,10 +6,11 @@ from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple, Union, Optional
 
-from .TestCoverage import _coverage
 from .Decorator import isRunningInSlicerGui, isRunningInTestMode
+from .EnsureRequirements import ensureRequirements
 from .Results import Results
 from .Settings import RunSettings
+from .TestCoverage import _coverage
 
 
 class RunnerLogic:
@@ -61,6 +62,11 @@ class RunnerLogic:
             If running in Python instance, the libraries will be loaded once and not reloaded afterward.
             Please use with caution.
         """
+        # Make sure the requirements are available before running the tests.
+        ensureRequirements(quiet=True)
+
+        # If the run in subprocess is undefined, run the in current Slicer in test mode.
+        # Otherwise, run in a subprocess
         if doRunInSubProcess is None:
             doRunInSubProcess = not isRunningInTestMode()
 
@@ -75,11 +81,16 @@ class RunnerLogic:
         return Results.fromReportFile(jsonResportPath)
 
     def _runInLocalPythonAndParseResults(self, directory, runSettings) -> Results:
+        # Override the settings in local mode to not close Slicer nor minimize the main window
         runSettings = deepcopy(runSettings)
         runSettings.doCloseSlicerAfterRun = False
         runSettings.doMinimizeMainWindow = False
+
+        # Configure the test python file and run locally with the input directory / json report file
         _, json_report_path = self._createTestPythonFile(directory, runSettings)
         self.runPytestAndExit(directory, json_report_path, runSettings)
+
+        # Return the results
         return Results.fromReportFile(json_report_path)
 
     def collectSubProcess(self, directory: Union[str, Path], runSettings: RunSettings) -> Results:
