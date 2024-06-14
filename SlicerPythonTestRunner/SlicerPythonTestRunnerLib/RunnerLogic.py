@@ -4,9 +4,9 @@ import tempfile
 import traceback
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Union
 
-from .Decorator import isRunningInSlicerGui, isRunningInTestMode
+from .Decorator import isRunningInSlicerGui
 from .EnsureRequirements import ensureRequirements
 from .Results import Results
 from .Settings import RunSettings
@@ -50,25 +50,19 @@ class RunnerLogic:
             self,
             directory: Union[str, Path],
             runSettings: RunSettings,
-            doRunInSubProcess: Optional[bool] = None
+            doRunInSubProcess: bool = True
     ) -> Results:
         """
         Run the tests given the input settings, wait for the results and returns the results.
 
         :param directory: Directory in which PyTest will be executed
         :param runSettings: Test settings
-        :param doRunInSubProcess: If None, will run in subprocess if not in Testing mode by default.
-            If True, runs in subprocess, otherwise, runs in current Python instance.
+        :param doRunInSubProcess: If True, runs in subprocess, otherwise, runs in current Python instance.
             If running in Python instance, the libraries will be loaded once and not reloaded afterward.
             Please use with caution.
         """
         # Make sure the requirements are available before running the tests.
         ensureRequirements(quiet=True)
-
-        # If the run in subprocess is undefined, run the in current Slicer in test mode.
-        # Otherwise, run in a subprocess
-        if doRunInSubProcess is None:
-            doRunInSubProcess = not isRunningInTestMode()
 
         if doRunInSubProcess:
             return self._runSubProcessAndParseResults(*self.prepareRun(directory, runSettings))

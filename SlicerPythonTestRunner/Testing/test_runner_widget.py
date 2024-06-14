@@ -8,6 +8,7 @@ from Testing.utils import write_file, a_test_file_with_passing_failing_tests_con
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_runner_widget_can_be_created_and_displayed():
     widget = RunnerWidget()
+    slicer.app.aboutToQuit.connect(widget.close)
     widget.show()
     slicer.app.processEvents()
 
@@ -44,6 +45,7 @@ def test_a_runner_widget_can_collect_tests(a_folder_with_tests):
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_settings_dialog_can_be_opened():
     d = SettingsDialog(RunSettings())
+    slicer.app.aboutToQuit.connect(d.close)
     d.show()
     d.okButton.clicked()
     d.cancelButton.clicked()

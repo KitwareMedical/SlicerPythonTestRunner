@@ -10,6 +10,7 @@ OptStringList = Optional[List[str]]
 class RunSettings:
     """
     Object representing execution settings for a test run.
+    Can be serialized to JSON.
     """
 
     def __init__(
@@ -22,7 +23,8 @@ class RunSettings:
             doRunCoverage: bool = False,
             coverageReportFormats: OptStringList = None,
             coverageSources: OptStringList = None,
-            coverageFilePath: Optional[str] = None
+            coverageFilePath: Optional[str] = None,
+            **_
     ):
         self.doCloseSlicerAfterRun = doCloseSlicerAfterRun
         self.doUseMainWindow = doUseMainWindow

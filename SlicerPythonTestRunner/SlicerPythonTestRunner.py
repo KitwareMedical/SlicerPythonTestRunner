@@ -28,7 +28,7 @@ class SlicerPythonTestRunner(ScriptedLoadableModule):
             'github page</a>'
         )
         self.parent.acknowledgementText = (
-            "This module was originally developed by Kitware SAS in order to help improve " 
+            "This module was originally developed by Kitware SAS in order to help improve "
             "Slicer modules and Slicer based applications code quality."
         )
 
@@ -53,7 +53,10 @@ class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
         slicer.mrmlScene.Clear()
 
         currentDirTest = Path(__file__).parent.joinpath("Testing")
-        results = RunnerLogic().runAndWaitFinished(currentDirTest, RunSettings(doUseMainWindow=False))
+        results = RunnerLogic().runAndWaitFinished(
+            currentDirTest,
+            RunSettings(doUseMainWindow=False, doCloseSlicerAfterRun=True)
+        )
 
         if results.failuresNumber:
             raise AssertionError(f"Test failed :\n{results.getFailingCasesString()}")

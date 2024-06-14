@@ -5,6 +5,7 @@ import slicer
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_settings_dialog_can_be_displayed():
     d = SettingsDialog(RunSettings())
+    slicer.app.aboutToQuit.connect(d.close)
     d.show()
     slicer.app.processEvents()
 
