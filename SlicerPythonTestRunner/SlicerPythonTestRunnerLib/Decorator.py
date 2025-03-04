@@ -11,6 +11,7 @@ def isRunningInSlicerGui() -> bool:
     """
     try:
         import slicer
+
         return slicer.app is not None
     except (ImportError, AttributeError):
         return False
@@ -22,6 +23,7 @@ def isRunningInTestMode() -> bool:
     """
     try:
         import slicer
+
         return slicer.app.testingEnabled()
     except (ImportError, AttributeError):
         return False
@@ -56,10 +58,10 @@ def runTestInSlicerContext(runSettings: RunSettings = None):
                         extraPytestArgs=[
                             *RunSettings.pytestFileFilterArgs(wrappedFile.name),
                             *RunSettings.pytestPatternFilterArgs(f.__name__),
-                            *runSettings.extraPytestArgs
+                            *runSettings.extraPytestArgs,
                         ],
-                        extraSlicerArgs=runSettings.extraSlicerArgs
-                    )
+                        extraSlicerArgs=runSettings.extraSlicerArgs,
+                    ),
                 )
                 if results.failuresNumber:
                     raise AssertionError(f"{f.__name__} execution failed:\n{results.getFailingCasesString()}")
@@ -73,6 +75,7 @@ def runTestInSlicerContext(runSettings: RunSettings = None):
 
 def skipTestOutsideSlicer(f):
     import pytest
+
     if not isRunningInSlicerGui():
         pytest.skip(f"Skipping test executed outside Slicer GUI : {f.__name__}")
     return f

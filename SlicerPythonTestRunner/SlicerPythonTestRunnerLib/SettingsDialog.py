@@ -1,6 +1,7 @@
 from typing import List
 
 import qt
+
 from .Settings import RunSettings
 
 try:
@@ -37,42 +38,47 @@ class SettingsDialog(QDialog):
 
         self.doCloseSlicerAfterRunCheckBox = create_checkbox(
             tooltip="If checked, closes Slicer Window after test run is complete.",
-            isChecked=settings.doCloseSlicerAfterRun
+            isChecked=settings.doCloseSlicerAfterRun,
         )
 
         self.doUseMainWindowCheckBox = create_checkbox(
             tooltip="If checked, launches tests in a Slicer with main window visbile.",
-            isChecked=settings.doUseMainWindow
+            isChecked=settings.doUseMainWindow,
         )
 
         self.doMinimizeMainWindowCheckBox = create_checkbox(
             tooltip="If checked, minimizes main window after it is launched.",
-            isChecked=settings.doMinimizeMainWindow
+            isChecked=settings.doMinimizeMainWindow,
+        )
+
+        self.nParallelInstances = qt.QSpinBox()
+        self.nParallelInstances.value = settings.nParallelInstances
+        self.nParallelInstances.toolTip = (
+            "Maximum number of parallel 3D Slicer instances " "launched when parallel run is active."
         )
 
         self.doRunCoverageCheckBox = create_checkbox(
-            tooltip=
-            "If checked, launches test coverage for given folder.\n"
+            tooltip="If checked, launches test coverage for given folder.\n"
             "Coverage will use the local .coveragerc file if any is present.",
-            isChecked=settings.doRunCoverage
+            isChecked=settings.doRunCoverage,
         )
 
         self.extraSlicerArgsLineEdit = create_text_list_line_edit(
             tooltip="Comma separated list of extra Slicer args to pass to run.",
             placeholder="--no-splash,--disable-modules,--ignore-slicerrc",
-            textArgs=settings.extraSlicerArgs
+            textArgs=settings.extraSlicerArgs,
         )
 
         self.extraPytestArgsLineEdit = create_text_list_line_edit(
             tooltip="Comma separated list of extra Pytest args to pass to run.",
             placeholder="--collect-only,--maxfail=2",
-            textArgs=settings.extraPytestArgs
+            textArgs=settings.extraPytestArgs,
         )
 
         self.coverageReportFormatsLineEdit = create_text_list_line_edit(
             tooltip="Comma separated list of formats for the output reports.",
             placeholder="html,xml,lcov",
-            textArgs=settings.coverageReportFormats
+            textArgs=settings.coverageReportFormats,
         )
 
         self.coverageSourcesLineEdit = create_text_list_line_edit(
@@ -84,13 +90,14 @@ class SettingsDialog(QDialog):
         self.coverageFilePathLineEdit = create_text_list_line_edit(
             tooltip="File path to the report file to generate",
             placeholder="my_report.xml",
-            textArgs=settings.coverageFilePath
+            textArgs=settings.coverageFilePath,
         )
 
         formLayout = qt.QFormLayout()
         formLayout.addRow("Close Slicer after run:", self.doCloseSlicerAfterRunCheckBox)
         formLayout.addRow("Use main Window:", self.doUseMainWindowCheckBox)
         formLayout.addRow("Minimize main Window:", self.doMinimizeMainWindowCheckBox)
+        formLayout.addRow("Max Slicer instances:", self.nParallelInstances)
         formLayout.addRow(qt.QLabel(""))
         formLayout.addRow("Extra Slicer args:", self.extraSlicerArgsLineEdit)
         formLayout.addRow("Extra PyTest args:", self.extraPytestArgsLineEdit)
@@ -127,6 +134,7 @@ class SettingsDialog(QDialog):
             coverageReportFormats=self.toList(self.coverageReportFormatsLineEdit.text),
             coverageSources=self.toList(self.coverageSourcesLineEdit.text),
             coverageFilePath=self.coverageFilePathLineEdit.text or None,
+            nParallelInstances=self.nParallelInstances.value,
         )
 
     @classmethod

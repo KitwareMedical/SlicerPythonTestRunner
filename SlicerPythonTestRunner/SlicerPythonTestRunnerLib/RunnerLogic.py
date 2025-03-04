@@ -1,16 +1,19 @@
+import os
 import subprocess
 import sys
 import tempfile
 import traceback
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Union
+
+import coverage
 
 from .Decorator import isRunningInSlicerGui
 from .EnsureRequirements import ensureRequirements
 from .Results import Results
 from .Settings import RunSettings
-from .TestCoverage import _coverage
+from .TestCoverage import _coverage, clean_tmp_coverage, write_cov_report
 
 
 class RunnerLogic:
@@ -28,18 +31,20 @@ class RunnerLogic:
     def default_path() -> Path:
         if isRunningInSlicerGui():
             import slicer
+
             return Path(slicer.app.applicationFilePath())
 
         return next(file for file in Path(sys.executable).parent.glob("SlicerApp*") if file.is_file()).resolve()
 
     @staticmethod
-    def startQProcess(process: "qt.QProcess", args) -> None:
+    def startQProcess(process, args) -> None:
         process.start(args[0], args[1:])
 
     @classmethod
-    def _runInSubProcessAndWaitFinished(cls, args):
+    def runInSubProcessAndWaitFinished(cls, args):
         if isRunningInSlicerGui():
             import qt
+
             process = qt.QProcess()
             cls.startQProcess(process, args)
             process.waitForFinished(-1)
@@ -47,10 +52,10 @@ class RunnerLogic:
             subprocess.run(args)
 
     def runAndWaitFinished(
-            self,
-            directory: Union[str, Path],
-            runSettings: RunSettings,
-            doRunInSubProcess: bool = True
+        self,
+        directory: Union[str, Path],
+        runSettings: RunSettings,
+        doRunInSubProcess: bool = True,
     ) -> Results:
         """
         Run the tests given the input settings, wait for the results and returns the results.
@@ -70,8 +75,8 @@ class RunnerLogic:
             return self._runInLocalPythonAndParseResults(directory, runSettings)
 
     @classmethod
-    def _runSubProcessAndParseResults(cls, args: List[str], jsonResportPath: Path) -> Results:
-        cls._runInSubProcessAndWaitFinished(args)
+    def _runSubProcessAndParseResults(cls, args: list[str], jsonResportPath: Path) -> Results:
+        cls.runInSubProcessAndWaitFinished(args)
         return Results.fromReportFile(jsonResportPath)
 
     def _runInLocalPythonAndParseResults(self, directory, runSettings) -> Results:
@@ -92,18 +97,19 @@ class RunnerLogic:
         Runs PyTest test collection. Uses the run processing as separate process to make sure that the pytest.main
         execution doesn't leak into previous / next execution.
         """
-        return self._runSubProcessAndParseResults(
-            *self.prepareCollect(directory, runSettings)
+        return self._runSubProcessAndParseResults(*self.prepareCollect(directory, runSettings))
+
+    def prepareCollect(self, directory: Union[str, Path], runSettings: RunSettings) -> tuple[list[str], Path]:
+        return self.prepareRun(
+            directory,
+            RunSettings(
+                doUseMainWindow=False,
+                extraSlicerArgs=runSettings.extraSlicerArgs,
+                extraPytestArgs=["--collect-only", *runSettings.extraPytestArgs],
+            ),
         )
 
-    def prepareCollect(self, directory: Union[str, Path], runSettings) -> Tuple[List[str], Path]:
-        return self.prepareRun(directory, RunSettings(
-            doUseMainWindow=False,
-            extraSlicerArgs=runSettings.extraSlicerArgs,
-            extraPytestArgs=["--collect-only", *runSettings.extraPytestArgs]
-        ))
-
-    def prepareRun(self, directory: Union[str, Path], runSettings: RunSettings) -> Tuple[List[str], Path]:
+    def prepareRun(self, directory: Union[str, Path], runSettings: RunSettings) -> tuple[list[str], Path]:
         """
         Prepares process args and path to JSON report path corresponding to test run with the input parameters.
         Is compatible with Python's subprocess run and QProcess.
@@ -113,7 +119,7 @@ class RunnerLogic:
             self.slicer_path.as_posix(),
             "--python-script",
             file_path.as_posix(),
-            *runSettings.extraSlicerArgs
+            *runSettings.extraSlicerArgs,
         ]
 
         noMainWindowArg = "--no-main-window"
@@ -122,32 +128,54 @@ class RunnerLogic:
 
         return args, json_report_path
 
-    @staticmethod
-    def runPyTest(exec_path: Union[str, Path], json_report_path: Union[str, Path], pytest_args: List[str]) -> int:
+    @classmethod
+    def runPyTest(
+        cls,
+        exec_path: Union[str, Path],
+        json_report_path: Union[str, Path],
+        pytest_args: list[str],
+    ) -> int:
         import pytest
         from pytest_jsonreport.plugin import JSONReport
 
         exec_path = Path(exec_path).resolve().as_posix()
         json_report_path = Path(json_report_path).resolve().as_posix()
         plugin = JSONReport()
-        ret = pytest.main([
-            exec_path,
-            f"--json-report-file={json_report_path}",
-            "--capture=tee-sys",
-            "--cache-clear",
-            *pytest_args
-        ], plugins=[plugin])
+        ret = pytest.main(
+            [
+                exec_path,
+                f"--json-report-file={json_report_path}",
+                f"--junitxml={json_report_path.replace('.json', '.xml')}",
+                f"--html={json_report_path.replace('.json', '.html')}",
+                "--capture=tee-sys",
+                "--cache-clear",
+                *cls.formatPytestArgs(pytest_args),
+            ],
+            plugins=[plugin],
+        )
         return int(ret)
+
+    @staticmethod
+    def formatPytestArgs(pytestArgs: list[str]) -> list[str]:
+        from datetime import datetime
+
+        from coverage.sqldata import filename_suffix
+
+        suffix = filename_suffix(True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.%f")
+
+        return [arg.format(filename_suffix=suffix, timestamp=timestamp) for arg in pytestArgs]
 
     @classmethod
     def runPytestAndExit(
-            cls,
-            path: Union[str, Path],
-            json_report_path: Union[str, Path],
-            runSettings: RunSettings
+        cls,
+        path: Union[str, Path],
+        json_report_path: Union[str, Path],
+        runSettings: RunSettings,
     ) -> int:
         try:
             import slicer  # noqa
+
             win = slicer.util.mainWindow()
             if win and runSettings.doMinimizeMainWindow:
                 win.showMinimized()
@@ -169,12 +197,12 @@ class RunnerLogic:
         return ret
 
     @staticmethod
-    def _libPaths() -> List[str]:
+    def _libPaths() -> list[str]:
         file_dir = Path(__file__).parent
         lib_dir = file_dir.parent
         return [file_dir.resolve().as_posix(), lib_dir.resolve().as_posix()]
 
-    def _createTestPythonFile(self, path: Union[str, Path], runSettings: RunSettings) -> Tuple[Path, Path]:
+    def _createTestPythonFile(self, path: Union[str, Path], runSettings: RunSettings) -> tuple[Path, Path]:
         """
         Creates a python file which will run the current file's `runPytestAndExit` in a new Slicer launcher instance
         with the passed args.
@@ -189,7 +217,7 @@ class RunnerLogic:
             "import sys\n"
             "import os\n"
             f'os.chdir(r"{path}")\n'
-            f'sys.path.extend({self._libPaths()})\n'
+            f"sys.path.extend({self._libPaths()})\n"
             "from SlicerPythonTestRunnerLib import RunnerLogic, RunSettings\n"
             f'runSettings = RunSettings.fromFile(r"{run_settings_path.as_posix()}")\n'
             "RunnerLogic.runPytestAndExit(\n"
@@ -202,9 +230,25 @@ class RunnerLogic:
 
         return file_path, json_report_path
 
-    def updateTemFilePaths(self) -> Tuple[Path, Path, Path]:
+    def updateTemFilePaths(self) -> tuple[Path, Path, Path]:
         json_report_path = Path(self.tmp_path).joinpath(f"pytest_file_{self.i_test_file}.json")
         file_path = Path(self.tmp_path).joinpath(f"pytest_file_{self.i_test_file}.py")
         run_settings_path = Path(self.tmp_path).joinpath(f"pytest_run_settings_{self.i_test_file}.json")
         self.i_test_file += 1
         return file_path, json_report_path, run_settings_path
+
+    @staticmethod
+    def writeCoverageReport(directory: str, runSettings: RunSettings) -> None:
+        if not runSettings.doRunCoverage or not os.path.exists(directory):
+            return
+
+        cwd = os.getcwd()
+
+        try:
+            os.chdir(directory)
+            write_cov_report(runSettings)
+            clean_tmp_coverage(directory)
+        except coverage.exceptions.CoverageException:
+            pass
+        finally:
+            os.chdir(cwd)

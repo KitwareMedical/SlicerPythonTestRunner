@@ -1,5 +1,9 @@
-from SlicerPythonTestRunnerLib import runTestInSlicerContext, RunSettings, SettingsDialog
 import slicer
+from SlicerPythonTestRunnerLib import (
+    RunSettings,
+    SettingsDialog,
+    runTestInSlicerContext,
+)
 
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
@@ -21,7 +25,7 @@ def test_a_settings_dialog_can_convert_to_and_from_run_settings():
         doRunCoverage=False,
         coverageReportFormats=["html", "xml"],
         coverageSources=["5"],
-        coverageFilePath="html/folder"
+        coverageFilePath="html/folder",
     )
     d = SettingsDialog(exp_settings)
     s = d.getRunSettings()

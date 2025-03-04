@@ -1,7 +1,7 @@
 import json
-from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
+
 import qt
 
 OptStringList = Optional[List[str]]
@@ -14,21 +14,25 @@ class RunSettings:
     """
 
     def __init__(
-            self,
-            doCloseSlicerAfterRun: bool = True,
-            doUseMainWindow: bool = True,
-            doMinimizeMainWindow: bool = True,
-            extraSlicerArgs: OptStringList = None,
-            extraPytestArgs: OptStringList = None,
-            doRunCoverage: bool = False,
-            coverageReportFormats: OptStringList = None,
-            coverageSources: OptStringList = None,
-            coverageFilePath: Optional[str] = None,
-            **_
+        self,
+        doCloseSlicerAfterRun: bool = True,
+        doUseMainWindow: bool = True,
+        doMinimizeMainWindow: bool = True,
+        doRunTestFilesIndependently: bool = True,
+        extraSlicerArgs: OptStringList = None,
+        extraPytestArgs: OptStringList = None,
+        doRunCoverage: bool = False,
+        nParallelInstances: int = 4,
+        coverageReportFormats: OptStringList = None,
+        coverageSources: OptStringList = None,
+        coverageFilePath: Optional[str] = None,
+        **_,
     ):
         self.doCloseSlicerAfterRun = doCloseSlicerAfterRun
         self.doUseMainWindow = doUseMainWindow
         self.doMinimizeMainWindow = doMinimizeMainWindow
+        self.doRunTestFilesIndependently = doRunTestFilesIndependently
+        self.nParallelInstances = nParallelInstances
         self.extraSlicerArgs = self._toArgList(extraSlicerArgs)
         self.extraPytestArgs = self._toArgList(extraPytestArgs)
         self.doRunCoverage = doRunCoverage
@@ -95,7 +99,10 @@ class ModuleSettings:
 
     @classmethod
     def _getSetting(cls, name, defaultVal):
-        return cls._cast(qt.QSettings().value(f"SlicerPythonTestRunner/{name}", defaultVal), defaultVal)
+        return cls._cast(
+            qt.QSettings().value(f"SlicerPythonTestRunner/{name}", defaultVal),
+            defaultVal,
+        )
 
     @classmethod
     def _setSetting(cls, name, value):
@@ -106,6 +113,7 @@ class ModuleSettings:
     @classmethod
     def _cast(cls, val, defaultVal):
         import slicer.util
+
         if isinstance(defaultVal, bool):
             return slicer.util.toBool(val)
         return type(defaultVal)(val)
