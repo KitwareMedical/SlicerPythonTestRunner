@@ -1,13 +1,18 @@
+from .Case import Case, Outcome
+from .Decorator import (
+    isRunningInSlicerGui,
+    isRunningInTestMode,
+    runTestInSlicerContext,
+    skipTestOutsideSlicer,
+)
 from .EnsureRequirements import ensureRequirements
-from .IconPath import iconPath, icon
-from .Signal import Signal
-from .QWidget import QWidget
-from .Settings import RunSettings, ModuleSettings
-from .SettingsDialog import SettingsDialog
+from .IconPath import icon, iconPath
 from .LoadingWidget import LoadingWidget
-from .Case import Outcome, Case
+from .QWidget import QWidget
 from .Results import Results
 from .RunnerLogic import RunnerLogic
-from .TreeView import TreeView
 from .RunnerWidget import RunnerWidget
-from .Decorator import runTestInSlicerContext, skipTestOutsideSlicer, isRunningInSlicerGui, isRunningInTestMode
+from .Settings import ModuleSettings, RunSettings
+from .SettingsDialog import SettingsDialog
+from .Signal import Signal
+from .TreeView import TreeView

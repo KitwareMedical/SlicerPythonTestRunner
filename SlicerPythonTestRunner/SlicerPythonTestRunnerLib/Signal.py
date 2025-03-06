@@ -3,7 +3,7 @@ from itertools import count
 
 
 class Signal(object):
-    """ Qt like signal slot connections. Enables using the same semantics with Slicer as qt.Signal lead to application
+    """Qt like signal slot connections. Enables using the same semantics with Slicer as qt.Signal lead to application
     crash.
     (see : https://discourse.slicer.org/t/custom-signal-slots-with-pythonqt/3278/5)
     """
@@ -42,4 +42,3 @@ class Signal(object):
 
     def blockSignals(self, isBlocked):
         self._isSignalBlocked = isBlocked
-

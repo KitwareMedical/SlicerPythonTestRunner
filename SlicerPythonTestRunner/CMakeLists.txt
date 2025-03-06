@@ -8,8 +8,10 @@ set(MODULE_PYTHON_SCRIPTS
   SlicerPythonTestRunnerLib/Case.py
   SlicerPythonTestRunnerLib/Decorator.py
   SlicerPythonTestRunnerLib/EnsureRequirements.py
+  SlicerPythonTestRunnerLib/ExportDialog.py
   SlicerPythonTestRunnerLib/IconPath.py
   SlicerPythonTestRunnerLib/LoadingWidget.py
+  SlicerPythonTestRunnerLib/ProcessRunnerLogic.py
   SlicerPythonTestRunnerLib/QWidget.py
   SlicerPythonTestRunnerLib/Results.py
   SlicerPythonTestRunnerLib/RunnerLogic.py
@@ -30,14 +32,16 @@ set(MODULE_PYTHON_SCRIPTS
   )
 
 set(MODULE_PYTHON_RESOURCES
+  Resources/Icons/SlicerPythonTestRunner.png
   Resources/Icons/show_ignored_icon.png
   Resources/Icons/show_passed_icon.png
-  Resources/Icons/SlicerPythonTestRunner.png
   Resources/Icons/test_collect_icon.png
+  Resources/Icons/test_export.png
   Resources/Icons/test_failed_icon.png
   Resources/Icons/test_loading.gif
   Resources/Icons/test_module_settings_icon.png
   Resources/Icons/test_ok_icon.png
+  Resources/Icons/test_parallel_start_icon.png
   Resources/Icons/test_skipped_icon.png
   Resources/Icons/test_start_icon.png
   Resources/Icons/test_stop_icon.png

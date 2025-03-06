@@ -3,9 +3,18 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
-from SlicerPythonTestRunnerLib import runTestInSlicerContext, Outcome, RunnerLogic, RunSettings, Results, TreeView
-from Testing.utils import write_file, a_file_with_one_passed_one_failed_one_skipped_content
+from SlicerPythonTestRunnerLib import (
+    Outcome,
+    Results,
+    RunnerLogic,
+    RunSettings,
+    TreeView,
+    runTestInSlicerContext,
+)
+from Testing.utils import (
+    a_file_with_one_passed_one_failed_one_skipped_content,
+    write_file,
+)
 
 
 @pytest.fixture
@@ -19,21 +28,21 @@ def an_empty_test_result_file(tmpdir):
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_tree_view_can_be_refreshed_with_empty_test_case(an_empty_test_result_file):
     view = TreeView()
-    view.refreshResults(Results.fromReportFile(an_empty_test_result_file))
+    view.appendResults(Results.fromReportFile(an_empty_test_result_file))
     assert view.getCaseCount() == 0
 
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_tree_view_is_populated_by_test_results(a_json_test_result_file):
     view = TreeView()
-    view.refreshResults(Results.fromReportFile(a_json_test_result_file))
+    view.appendResults(Results.fromReportFile(a_json_test_result_file))
     assert view.getCaseCount() == 3
 
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_tree_view_displays_test_result_outcomes(a_json_test_result_file):
     view = TreeView()
-    view.refreshResults(Results.fromReportFile(a_json_test_result_file))
+    view.appendResults(Results.fromReportFile(a_json_test_result_file))
 
     exp_outcomes = {
         "test_failing_file.py": Outcome.failed,
@@ -53,7 +62,7 @@ def a_file_with_one_passed_one_failed_one_skipped(tmpdir):
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_tree_view_notifies_clicked_cases(a_json_test_result_file):
     view = TreeView()
-    view.refreshResults(Results.fromReportFile(a_json_test_result_file))
+    view.appendResults(Results.fromReportFile(a_json_test_result_file))
 
     callMock = MagicMock()
 
@@ -67,11 +76,12 @@ def test_a_tree_view_notifies_clicked_cases(a_json_test_result_file):
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_a_tree_view_can_filter_passed_and_ignored_tests(a_file_with_one_passed_one_failed_one_skipped, tmpdir):
     import slicer
+
     results = RunnerLogic().runAndWaitFinished(tmpdir, RunSettings(doUseMainWindow=False))
     assert results.executedNumber == 3
 
     view = TreeView()
-    view.refreshResults(results)
+    view.appendResults(results)
 
     view.setShowPassed(True)
     view.setShowIgnored(True)

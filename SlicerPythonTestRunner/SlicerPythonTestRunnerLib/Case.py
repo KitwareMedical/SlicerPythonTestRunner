@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
-from enum import unique, IntEnum, auto
-from typing import List, Dict
+from enum import IntEnum, auto, unique
+from typing import Dict, List
 
 
 @unique
@@ -84,7 +84,7 @@ class Case:
         return cls(
             outcome=outcome,
             nodeid=case["nodeid"],
-            duration=sum([case.get(d, {}).get("duration", 0.) for d in ["setup", "call", "teardown"]]),
+            duration=sum([case.get(d, {}).get("duration", 0.0) for d in ["setup", "call", "teardown"]]),
             message=caseCall.get("longrepr", ""),
             stdout=caseCall.get("stdout", ""),
             stderr=caseCall.get("stderr", ""),
@@ -109,7 +109,7 @@ class Case:
             return []
 
         nodeIdHead = re.split(r"[^a-zA-Z0-9:_./\\\s]", nodeid)[0]
-        nodeIdTail = nodeid[len(nodeIdHead):]
+        nodeIdTail = nodeid[len(nodeIdHead) :]
         nodeIdParts = nodeIdHead.split("::")
         nodeIdParts[-1] += nodeIdTail
 
@@ -159,3 +159,6 @@ class Case:
             f"{pad_str}[LOGGING]{pad_str}\n"
             f"{logs_str}"
         )
+
+    def getRootId(self):
+        return self.nodeIdParts(self.nodeid)[0]

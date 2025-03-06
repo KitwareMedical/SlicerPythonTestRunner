@@ -1,10 +1,11 @@
 from pathlib import Path
 
 import slicer
-from slicer.ScriptedLoadableModule import *
-from slicer.util import VTKObservationMixin
-
-from SlicerPythonTestRunnerLib import RunnerLogic, RunnerWidget, RunSettings
+from slicer.ScriptedLoadableModule import (
+    ScriptedLoadableModule,
+    ScriptedLoadableModuleTest,
+    ScriptedLoadableModuleWidget,
+)
 
 
 class SlicerPythonTestRunner(ScriptedLoadableModule):
@@ -25,7 +26,7 @@ class SlicerPythonTestRunner(ScriptedLoadableModule):
             "After the tests have been run, the results are displayed in the UI.<br><br>"
             "The plugin also provides decorators to help running unit tests directly in your favorite IDEs.\n"
             'Learn more on our <a href="https://github.com/KitwareMedical/SlicerPythonTestRunner">'
-            'github page</a>'
+            "github page</a>"
         )
         self.parent.acknowledgementText = (
             "This module was originally developed by Kitware SAS in order to help improve "
@@ -41,6 +42,8 @@ class SlicerPythonTestRunnerWidget(ScriptedLoadableModuleWidget):
         """
         Called when the user opens the module the first time and the widget is initialized.
         """
+        from SlicerPythonTestRunnerLib import RunnerWidget
+
         super().setup()
         self.layout.addWidget(RunnerWidget())
 
@@ -50,12 +53,13 @@ class SlicerPythonTestRunnerTest(ScriptedLoadableModuleTest):
         """
         Clear scene and run every test in the Testing folder
         """
+        from SlicerPythonTestRunnerLib import RunnerLogic, RunSettings
+
         slicer.mrmlScene.Clear()
 
         currentDirTest = Path(__file__).parent.joinpath("Testing")
         results = RunnerLogic().runAndWaitFinished(
-            currentDirTest,
-            RunSettings(doUseMainWindow=False, doCloseSlicerAfterRun=True)
+            currentDirTest, RunSettings(doUseMainWindow=False, doCloseSlicerAfterRun=True)
         )
 
         if results.failuresNumber:

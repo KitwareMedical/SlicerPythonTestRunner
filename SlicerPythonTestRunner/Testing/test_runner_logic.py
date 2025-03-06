@@ -1,11 +1,24 @@
+import os.path
 from pathlib import Path
 
 import pytest
 import qt
-
-from SlicerPythonTestRunnerLib import RunnerLogic, Results, Case, runTestInSlicerContext, RunSettings
-from Testing.utils import a_reporting_failing_test_content, a_success_test_content, a_slicer_test_content, \
-    a_failing_test_content, a_succeeding_test_file_with_two_tests_content, a_unittest_case_content, write_file
+from SlicerPythonTestRunnerLib import (
+    Case,
+    Results,
+    RunnerLogic,
+    RunSettings,
+    runTestInSlicerContext,
+)
+from Testing.utils import (
+    a_failing_test_content,
+    a_reporting_failing_test_content,
+    a_slicer_test_content,
+    a_succeeding_test_file_with_two_tests_content,
+    a_success_test_content,
+    a_unittest_case_content,
+    write_file,
+)
 
 
 @pytest.fixture()
@@ -45,15 +58,15 @@ def test_runner_can_run_failing_tests(a_test_runner, a_failing_test_file, tmpdir
 
 @pytest.fixture()
 def a_succeeding_test_file_with_two_tests(tmpdir):
-    return write_file(tmpdir, "test_success_file_two_tests.py", a_succeeding_test_file_with_two_tests_content())
+    return write_file(
+        tmpdir,
+        "test_success_file_two_tests.py",
+        a_succeeding_test_file_with_two_tests_content(),
+    )
 
 
 @pytest.fixture()
-def a_collection_of_3_test_dir(
-        a_failing_test_file,
-        a_succeeding_test_file_with_two_tests,
-        tmpdir
-):
+def a_collection_of_3_test_dir(a_failing_test_file, a_succeeding_test_file_with_two_tests, tmpdir):
     return tmpdir
 
 
@@ -69,7 +82,9 @@ def test_runner_tests_can_be_parsed(a_json_test_result_file):
         assert False, res.getFailingCasesString()
 
 
-def test_runner_tests_with_collect_errors_can_be_parsed(a_json_test_with_collect_errors_result_file):
+def test_runner_tests_with_collect_errors_can_be_parsed(
+    a_json_test_with_collect_errors_result_file,
+):
     res = Results.fromReportFile(a_json_test_with_collect_errors_result_file)
     assert res.failuresNumber == 2
 
@@ -79,7 +94,9 @@ def test_runner_tests_with_collect_errors_can_be_parsed(a_json_test_with_collect
         assert False, res.getFailingCasesString()
 
 
-def test_runner_results_ignore_init_file_collection(a_json_test_with_collect_errors_result_file):
+def test_runner_results_ignore_init_file_collection(
+    a_json_test_with_collect_errors_result_file,
+):
     res = Results.fromReportFile(a_json_test_with_collect_errors_result_file)
     assert res.collectedNumber == 0
 
@@ -111,29 +128,38 @@ def a_unittest_case_file(tmpdir):
 
 
 def test_runner_can_run_unittest_test_case_files(a_test_runner, a_unittest_case_file, tmpdir):
-    res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(
-        doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py")
-    ))
+    res = a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py"),
+        ),
+    )
     assert res.executedNumber == 2
     assert res.failuresNumber == 1
     assert res.collectedNumber == 0
 
 
 def test_runner_can_collect_unittest_test_case_files(a_test_runner, a_unittest_case_file, tmpdir):
-    res = a_test_runner.collectSubProcess(tmpdir, RunSettings(
-        doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py")
-    ))
+    res = a_test_runner.collectSubProcess(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py"),
+        ),
+    )
     assert res.executedNumber == 0
     assert res.collectedNumber == 2
 
 
 def test_runner_can_filter_function_names(a_test_runner, a_succeeding_test_file_with_two_tests, tmpdir):
-    res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(
-        doUseMainWindow=False,
-        extraPytestArgs=RunSettings.pytestPatternFilterArgs("_2")
-    ))
+    res = a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=RunSettings.pytestPatternFilterArgs("_2"),
+        ),
+    )
     assert res.executedNumber == 1
     assert res.passedNumber == 1
 
@@ -145,15 +171,19 @@ def test_runner_can_collect_files_only(a_test_runner, a_collection_of_3_test_dir
 
 
 @pytest.mark.parametrize(
-    "nodeid, exp_parent_id", [
+    "nodeid, exp_parent_id",
+    [
         ("", ""),
         ("test_case.py", ""),
         ("test_case.py::TestCase::test_hello_world", "test_case.py::TestCase"),
         ("test_case.py::test_my_test", "test_case.py"),
-        ("test_case.py::test_my_test::parametrized[A::B::C]", "test_case.py::test_my_test"),
+        (
+            "test_case.py::test_my_test::parametrized[A::B::C]",
+            "test_case.py::test_my_test",
+        ),
         ("A/B/test_case.py::test_my_test", "A/B/test_case.py"),
         ("A\\test_case.py::test_my_test", "A\\test_case.py"),
-    ]
+    ],
 )
 def test_a_case_base_ids(nodeid, exp_parent_id):
     assert Case(nodeid=nodeid).getParentID() == exp_parent_id
@@ -162,6 +192,7 @@ def test_a_case_base_ids(nodeid, exp_parent_id):
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_can_be_run_in_slicer_context():
     import slicer
+
     print(slicer.app)
 
 
@@ -183,70 +214,37 @@ def test_runner_prepare_run_can_be_used_by_q_process(a_test_runner, a_succeeding
         ("report.json", ["json"]),
         ("report.info", ["lcov"]),
         ("report_dir", ["html"]),
-    ]
+    ],
 )
 def test_runner_supports_coverage_files(
-        a_test_runner,
-        a_succeeding_test_file_with_two_tests,
-        tmpdir,
-        file_path,
-        cov_format
+    a_test_runner, a_succeeding_test_file_with_two_tests, tmpdir, file_path, cov_format
 ):
     coverage_path = Path(tmpdir).joinpath(file_path)
     settings = RunSettings(
         doRunCoverage=True,
         doUseMainWindow=False,
         coverageReportFormats=cov_format,
-        coverageFilePath=coverage_path.as_posix()
+        coverageFilePath=coverage_path.as_posix(),
     )
     a_test_runner.runAndWaitFinished(tmpdir, settings)
+    a_test_runner.writeCoverageReport(tmpdir, settings)
     assert coverage_path.exists()
 
 
 @pytest.fixture
 def a_project_with_configuration_files(tmpdir):
-    s1 = (
-        "def f_a():\n"
-        "  print('a')\n"
-    )
-    s2 = (
-        "from .s1 import f_a\n"
-        "def f_b():\n"
-        "  f_a()\n"
-        "  print('b')\n"
-    )
+    s1 = "def f_a():\n" "  print('a')\n"
+    s2 = "from .s1 import f_a\n" "def f_b():\n" "  f_a()\n" "  print('b')\n"
 
-    s_init = (
-        "from .s1 import *\n"
-        "from .s2 import *\n"
-    )
+    s_init = "from .s1 import *\n" "from .s2 import *\n"
 
-    test_a = (
-        "from src_lib import f_a\n"
-        "def test_f_a():\n"
-        "  f_a()\n"
-    )
+    test_a = "from src_lib import f_a\n" "def test_f_a():\n" "  f_a()\n"
 
-    test_b = (
-        "from src_lib import f_b\n"
-        "def test_f_b():\n"
-        "  f_b()\n"
-    )
+    test_b = "from src_lib import f_b\n" "def test_f_b():\n" "  f_b()\n"
 
-    pytest_ini = (
-        "[pytest]\n"
-        "minversion = 6.0\n"
-        "pythonpath = ./\n"
-        "testpaths =\n"
-        "    ./weird_test_name\n"
-    )
+    pytest_ini = "[pytest]\n" "minversion = 6.0\n" "pythonpath = ./\n" "testpaths =\n" "    ./weird_test_name\n"
 
-    coverage_file = (
-        "[run]\n"
-        "branch = True\n\n"
-        "[html]\n"
-        "directory = coverage_html_report\n"
-    )
+    coverage_file = "[run]\n" "branch = True\n\n" "[html]\n" "directory = coverage_html_report\n"
 
     write_file(tmpdir, "src_lib/__init__.py", s_init)
     write_file(tmpdir, "src_lib/s1.py", s1)
@@ -260,11 +258,11 @@ def a_project_with_configuration_files(tmpdir):
 
 
 def test_runner_uses_local_config_files_if_present_in_the_run_dir(
-        tmpdir,
-        a_project_with_configuration_files,
-        a_test_runner
+    tmpdir, a_project_with_configuration_files, a_test_runner
 ):
-    res = a_test_runner.runAndWaitFinished(tmpdir, RunSettings(doUseMainWindow=False, doRunCoverage=True))
+    runSettings = RunSettings(doUseMainWindow=False, doRunCoverage=True)
+    res = a_test_runner.runAndWaitFinished(tmpdir, runSettings)
+    a_test_runner.writeCoverageReport(tmpdir, runSettings)
     assert res.executedNumber == 2
     assert res.passedNumber == 2
     report_path = Path(tmpdir).joinpath("coverage_html_report")
@@ -287,18 +285,14 @@ def a_test_case_with_two_tests(tmpdir):
 
 
 def test_runner_filter_function_can_run_specific_function_from_test_class(
-        tmpdir,
-        a_test_case_with_two_tests,
-        a_test_runner
+    tmpdir, a_test_case_with_two_tests, a_test_runner
 ):
     res = a_test_runner.runAndWaitFinished(
         tmpdir,
         RunSettings(
             doUseMainWindow=False,
-            extraPytestArgs=
-            RunSettings.pytestFileFilterArgs("*.py") +
-            RunSettings.pytestPatternFilterArgs("test_1")
-        )
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py") + RunSettings.pytestPatternFilterArgs("test_1"),
+        ),
     )
 
     assert res.executedNumber == 1
@@ -307,27 +301,11 @@ def test_runner_filter_function_can_run_specific_function_from_test_class(
 
 @pytest.fixture
 def a_dir_with_collect_problems(tmpdir):
-    s1 = (
-        "from .s2 import f_b\n"
-        "def f_a():\n"
-        "  pass\n"
-    )
-    s2 = (
-        "from .s1 import f_a\n"
-        "def f_b():\n"
-        "  pass\n"
-    )
-    t1 = (
-        "from pck.s1 import f_a\n"
-        "def test_1():\n"
-        "  pass\n"
-    )
+    s1 = "from .s2 import f_b\n" "def f_a():\n" "  pass\n"
+    s2 = "from .s1 import f_a\n" "def f_b():\n" "  pass\n"
+    t1 = "from pck.s1 import f_a\n" "def test_1():\n" "  pass\n"
 
-    t2 = (
-        "from pck.s2 import f_b\n"
-        "def test_2():\n"
-        "  pass\n"
-    )
+    t2 = "from pck.s2 import f_b\n" "def test_2():\n" "  pass\n"
 
     write_file(tmpdir, "pck/__init__.py", "")
     write_file(tmpdir, "pck/s1.py", s1)
@@ -349,12 +327,63 @@ def test_runner_can_be_run_in_local_python(a_test_runner, a_test_case_with_two_t
         tmpdir,
         RunSettings(
             doUseMainWindow=False,
-            extraPytestArgs=
-            RunSettings.pytestFileFilterArgs("*.py") +
-            RunSettings.pytestPatternFilterArgs("test_1")
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py") + RunSettings.pytestPatternFilterArgs("test_1"),
         ),
-        doRunInSubProcess=False
+        doRunInSubProcess=False,
     )
 
     assert res.executedNumber == 1
     assert res.passedNumber == 1
+
+
+@pytest.fixture()
+def a_dir_with_three_test_files(tmpdir, a_test_case_with_two_tests, a_collection_of_3_test_dir):
+    return tmpdir
+
+
+def test_given_a_test_result_result_can_output_list_of_file_patterns(
+    a_test_runner, tmpdir, a_dir_with_three_test_files
+):
+    res = a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py"),
+        ),
+        doRunInSubProcess=False,
+    )
+
+    assert res.getFilePathList() == [
+        "test_failing_file.py",
+        "test_success_file_two_tests.py",
+        "test_testcase_with_two_tests.py",
+    ]
+
+
+def test_runner_generates_junit_xml_results(a_test_runner, tmpdir, a_dir_with_three_test_files):
+    runSettings = RunSettings(doUseMainWindow=False, extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py"))
+    args, json_path = a_test_runner.prepareRun(tmpdir, runSettings)
+    a_test_runner.runInSubProcessAndWaitFinished(args)
+    assert os.path.exists(json_path)
+    assert os.path.exists(json_path.with_suffix(".xml"))
+
+
+@pytest.mark.parametrize("arg_name", ["filename_suffix", "timestamp"])
+def test_runner_formats_pytest_args(a_test_runner, tmpdir, a_dir_with_three_test_files, arg_name):
+    file_folder = Path(tmpdir)
+    file_name = "my_xml_file_{" + arg_name + "}.xml"
+    path_template = file_folder.joinpath(file_name).as_posix()
+
+    a_test_runner.runAndWaitFinished(
+        tmpdir,
+        RunSettings(
+            doUseMainWindow=False,
+            extraPytestArgs=RunSettings.pytestFileFilterArgs("*.py") + [f"--junitxml={path_template}"],
+        ),
+        doRunInSubProcess=False,
+    )
+
+    xml_file = next(file_folder.glob("my_xml_file_*"))
+    assert xml_file.name != file_name
+    assert xml_file.name != "my_xml_file_{}.xml"
+    assert xml_file.name != "my_xml_file_.xml"

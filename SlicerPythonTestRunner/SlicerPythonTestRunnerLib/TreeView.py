@@ -2,12 +2,12 @@ from typing import Dict, Optional
 
 import qt
 
-from .Signal import Signal
 from .Case import Case, Outcome
 from .IconPath import icon
 from .LoadingWidget import LoadingWidget
 from .QWidget import QWidget
 from .Results import Results
+from .Signal import Signal
 from .TreeProxyModel import TreeProxyModel
 
 
@@ -33,7 +33,7 @@ class TreeView(QWidget):
         self.nodeIdItemDict: Dict[str, qt.QTreeWidgetItem] = {}
 
         self.resultLabel = qt.QLabel(self)
-        self.lastResults = Results("", [])
+        self.lastResults = Results([])
         self.stack.addWidget(self.loading)
         self.stack.addWidget(self.tree)
         layout = qt.QVBoxLayout(self)
@@ -44,7 +44,10 @@ class TreeView(QWidget):
         self.setCurrentWidgetToTreeResults()
 
     def clear(self):
-        self.refreshResults(Results("", []))
+        self.treeModel.clear()
+        self.nodeIdItemDict.clear()
+        self.lastResults = Results([])
+        self.appendResults(Results([]))
 
     def getCaseCount(self) -> int:
         cases = [self.getItemData(item) for item in self.nodeIdItemDict.values()]
@@ -56,19 +59,18 @@ class TreeView(QWidget):
     def getDisplayedIndexRowCount(self, parentIndex):
         parentIndex = parentIndex or qt.QModelIndex()
         count = self.treeProxyModel.rowCount(parentIndex)
-        return count + sum([
-            self.getDisplayedIndexRowCount(
-                self.treeProxyModel.index(i_child, 0, parentIndex)
-            ) for i_child in range(count)
-        ])
+        return count + sum(
+            [
+                self.getDisplayedIndexRowCount(self.treeProxyModel.index(i_child, 0, parentIndex))
+                for i_child in range(count)
+            ]
+        )
 
     def getOutcomes(self) -> Dict[str, Outcome]:
         return {nodeId: self.getItemOutcome(item) for nodeId, item in self.nodeIdItemDict.items()}
 
-    def refreshResults(self, results: Results) -> None:
-        self.treeModel.clear()
-        self.nodeIdItemDict.clear()
-        self.lastResults = results
+    def appendResults(self, results):
+        self.lastResults.append(results)
 
         for case in results.getAllCases():
             if not self.hasParentItem(case):
@@ -193,5 +195,5 @@ class TreeView(QWidget):
         return [parentCase] + leafCases if parentCase else leafCases
 
     def onItemClicked(self, index):
-        results = Results(self.lastResults.testRoot, self.getDisplayedCases(index))
+        results = Results(self.getDisplayedCases(index))
         self.currentCaseTextChanged.emit(results.getSummaryString() + "\n\n" + results.getFailingCasesString())

@@ -16,10 +16,7 @@ def a_reporting_failing_test_content():
 
 
 def a_success_test_content():
-    return (
-        "def test_success():\n"
-        "  assert True\n"
-    )
+    return "def test_success():\n" "  assert True\n"
 
 
 def a_slicer_test_content():
@@ -32,28 +29,15 @@ def a_slicer_test_content():
 
 
 def a_failing_test_content():
-    return (
-        "def test_failing():\n"
-        "  assert False\n"
-    )
+    return "def test_failing():\n" "  assert False\n"
 
 
 def a_succeeding_test_file_with_two_tests_content():
-    return (
-        "def test_success_1():\n"
-        "  pass\n"
-        "def test_success_2():\n"
-        "  pass\n"
-    )
+    return "def test_success_1():\n" "  pass\n" "def test_success_2():\n" "  pass\n"
 
 
 def a_test_file_with_passing_failing_tests_content():
-    return (
-        "def test_pass():\n"
-        "  pass\n"
-        "def test_fail():\n"
-        "  assert False\n"
-    )
+    return "def test_pass():\n" "  pass\n" "def test_fail():\n" "  assert False\n"
 
 
 def a_unittest_case_content():
