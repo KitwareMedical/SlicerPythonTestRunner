@@ -3,6 +3,7 @@ def ensureRequirements(quiet=False):
         import coverage  # noqa
         import junit2htmlreport  # noqa
         import junitparser  # noqa
+        import psutil  # noqa
         import pytest  # noqa
         import pytest_jsonreport  # noqa
     except ImportError:
@@ -19,3 +20,4 @@ def ensureRequirements(quiet=False):
         slicer.util.pip_install("-q junit2html")
         slicer.util.pip_install("-q pytest-html")
         slicer.util.pip_install("-q pytest-html-merger")
+        slicer.util.pip_install("-q psutil")
