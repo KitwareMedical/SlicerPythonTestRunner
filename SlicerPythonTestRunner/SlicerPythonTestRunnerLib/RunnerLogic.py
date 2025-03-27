@@ -7,8 +7,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Union
 
-import coverage
-
 from .Decorator import isRunningInSlicerGui
 from .EnsureRequirements import ensureRequirements
 from .Results import Results
@@ -239,6 +237,8 @@ class RunnerLogic:
 
     @staticmethod
     def writeCoverageReport(directory: str, runSettings: RunSettings) -> None:
+        import coverage
+
         if not runSettings.doRunCoverage or not os.path.exists(directory):
             return
 
