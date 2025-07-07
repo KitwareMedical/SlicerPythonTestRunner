@@ -1,6 +1,4 @@
-from typing import Dict, Optional
-
-import qt
+from typing import TYPE_CHECKING, Dict, Optional
 
 from .Case import Case, Outcome
 from .IconPath import icon
@@ -10,9 +8,14 @@ from .Results import Results
 from .Signal import Signal
 from .TreeProxyModel import TreeProxyModel
 
+if TYPE_CHECKING:
+    import qt
+
 
 class TreeView(QWidget):
     def __init__(self, parent=None):
+        import qt
+
         super().__init__(parent)
         self.currentCaseTextChanged = Signal("str")
 
@@ -57,6 +60,8 @@ class TreeView(QWidget):
         return self.getDisplayedIndexRowCount(None)
 
     def getDisplayedIndexRowCount(self, parentIndex):
+        import qt
+
         parentIndex = parentIndex or qt.QModelIndex()
         count = self.treeProxyModel.rowCount(parentIndex)
         return count + sum(
@@ -127,6 +132,8 @@ class TreeView(QWidget):
         return self.createItem(case.nodeid, case)
 
     def createItem(self, caseNodeId: str, case: Optional[Case] = None) -> "qt.QTreeWidgetItem":
+        import qt
+
         item = qt.QStandardItem()
         item.setText(Case.caseNameFromId(caseNodeId))
         item.setData(case, qt.Qt.UserRole)
@@ -135,9 +142,13 @@ class TreeView(QWidget):
 
     @staticmethod
     def getItemData(item):
+        import qt
+
         return item.data(qt.Qt.UserRole)
 
     def updateOutcome(self):
+        import qt
+
         for item in self.nodeIdItemDict.values():
             outcome = self.getItemOutcome(item)
             item.setIcon(self.getItemIcon(outcome))
@@ -145,6 +156,8 @@ class TreeView(QWidget):
 
     @classmethod
     def getItemIcon(cls, outcome: Outcome) -> "qt.QIcon":
+        import qt
+
         okIcon = icon("test_ok_icon.png")
         failIcon = icon("test_failed_icon.png")
         skipIcon = icon("test_skipped_icon.png")
@@ -184,6 +197,8 @@ class TreeView(QWidget):
         self.treeProxyModel.showCollected = doShowCollected
 
     def getDisplayedCases(self, parentIndex):
+        import qt
+
         parentIndex = parentIndex or qt.QModelIndex()
         parentCase = self.treeProxyModel.data(parentIndex, qt.Qt.UserRole)
         leafCases = [

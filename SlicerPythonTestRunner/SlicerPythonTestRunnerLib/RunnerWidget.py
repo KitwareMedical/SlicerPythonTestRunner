@@ -1,7 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import qt
 import slicer
 
 from .EnsureRequirements import ensureRequirements
@@ -18,6 +17,8 @@ from .TreeView import TreeView
 
 class ProgressWidget(QWidget):
     def __init__(self, parent=None):
+        import qt
+
         super().__init__(parent)
 
         self._progressLabel = qt.QLabel()
@@ -42,6 +43,7 @@ class RunnerWidget(QWidget):
 
     def __init__(self, parent=None):
         import ctk
+        import qt
 
         super().__init__(parent)
 

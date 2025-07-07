@@ -6,5 +6,10 @@ try:
     import qt
 
     QWidget = qt.QWidget
-except AttributeError:
+    QDialog = qt.QDialog
+    QSortFilterProxyModel = qt.QSortFilterProxyModel
+
+except (AttributeError, ModuleNotFoundError):
     QWidget = object
+    QDialog = object
+    QSortFilterProxyModel = object

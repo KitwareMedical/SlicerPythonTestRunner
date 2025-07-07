@@ -3,13 +3,9 @@ import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import qt
 import slicer.util
 
-try:
-    QDialog = qt.QDialog
-except AttributeError:
-    QDialog = object
+from .QWidget import QDialog
 
 
 class ExportLogic:
@@ -96,6 +92,8 @@ class ExportDialog(QDialog):
     """
 
     def __init__(self, xmlFilePath: Path, htmlFilePath: Path, defaultDir: Path, parent=None):
+        import qt
+
         super().__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~qt.Qt.WindowContextHelpButtonHint)
         self._xmlFilePath = xmlFilePath
@@ -126,6 +124,8 @@ class ExportDialog(QDialog):
         layout.addWidget(buttonBox)
 
     def onPathButtonClicked(self, *_):
+        import qt
+
         savePath = qt.QFileDialog.getSaveFileName(
             self, "Select report output path", self.exportPath.text, "*.html;;*.xml"
         )

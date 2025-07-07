@@ -1,6 +1,8 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import qt
+if TYPE_CHECKING:
+    import qt
 
 
 def iconPath(icon_name) -> str:
@@ -8,4 +10,6 @@ def iconPath(icon_name) -> str:
 
 
 def icon(icon_name) -> "qt.QIcon":
+    import qt
+
     return qt.QIcon(iconPath(icon_name))
