@@ -1,11 +1,11 @@
-import qt
-
 from .IconPath import iconPath
 from .QWidget import QWidget
 
 
 class LoadingIcon(QWidget):
     def __init__(self, iconSize, parent=None):
+        import qt
+
         super().__init__(parent)
 
         layout = qt.QVBoxLayout(self)
@@ -25,6 +25,8 @@ class LoadingWidget(QWidget):
     """
 
     def __init__(self, parent=None):
+        import qt
+
         super().__init__(parent)
         layout = qt.QVBoxLayout(self)
         layout.addStretch()

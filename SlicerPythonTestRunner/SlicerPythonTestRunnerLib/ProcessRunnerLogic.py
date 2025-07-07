@@ -4,7 +4,6 @@ from queue import Queue
 from time import sleep
 from typing import Callable, Optional
 
-import qt
 import slicer
 
 from .RunnerLogic import Results, RunnerLogic, RunSettings
@@ -30,6 +29,8 @@ class TestProcess:
         self._process.deleteLater()
 
     def _initProcess(self):
+        import qt
+
         self._process = qt.QProcess()
         self._process.finished.connect(self.onProcessFinished)
 
@@ -273,6 +274,7 @@ class ProcessRunnerLogic:
         """
         Sleeps current thread while not blocking Qt interaction.
         """
+        import qt
 
         class _Wait:
             is_waiting = True

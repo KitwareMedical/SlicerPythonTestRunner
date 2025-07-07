@@ -1,16 +1,12 @@
 from typing import List
 
-import qt
-
+from .QWidget import QDialog
 from .Settings import RunSettings
-
-try:
-    QDialog = qt.QDialog
-except AttributeError:
-    QDialog = object
 
 
 def create_checkbox(tooltip, isChecked):
+    import qt
+
     checkbox = qt.QCheckBox()
     checkbox.setToolTip(tooltip)
     checkbox.setChecked(isChecked)
@@ -18,6 +14,8 @@ def create_checkbox(tooltip, isChecked):
 
 
 def create_text_list_line_edit(tooltip, placeholder, textArgs):
+    import qt
+
     line_edit = qt.QLineEdit()
     line_edit.setToolTip(tooltip)
     line_edit.setPlaceholderText(placeholder)
@@ -32,6 +30,8 @@ def create_text_list_line_edit(tooltip, placeholder, textArgs):
 
 class SettingsDialog(QDialog):
     def __init__(self, settings: RunSettings, parent=None):
+        import qt
+
         super().__init__(parent)
 
         self.setWindowFlags(self.windowFlags() & ~qt.Qt.WindowContextHelpButtonHint)
@@ -42,7 +42,7 @@ class SettingsDialog(QDialog):
         )
 
         self.doUseMainWindowCheckBox = create_checkbox(
-            tooltip="If checked, launches tests in a Slicer with main window visbile.",
+            tooltip="If checked, launches tests in a Slicer with main window visible.",
             isChecked=settings.doUseMainWindow,
         )
 

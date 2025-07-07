@@ -1,11 +1,5 @@
-import qt
-
 from .Case import Outcome
-
-try:
-    QSortFilterProxyModel = qt.QSortFilterProxyModel
-except AttributeError:
-    QSortFilterProxyModel = object
+from .QWidget import QSortFilterProxyModel
 
 
 class TreeProxyModel(QSortFilterProxyModel):
@@ -43,6 +37,8 @@ class TreeProxyModel(QSortFilterProxyModel):
         self.invalidate()
 
     def filterAcceptsRow(self, sourceRow, sourceParent):
+        import qt
+
         index = self.sourceModel.index(sourceRow, 0, sourceParent)
         outcome = self.sourceModel.data(index, qt.Qt.UserRole + 1)
         if outcome is None:

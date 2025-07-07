@@ -2,8 +2,6 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import qt
-
 OptStringList = Optional[List[str]]
 
 
@@ -99,6 +97,8 @@ class ModuleSettings:
 
     @classmethod
     def _getSetting(cls, name, defaultVal):
+        import qt
+
         return cls._cast(
             qt.QSettings().value(f"SlicerPythonTestRunner/{name}", defaultVal),
             defaultVal,
@@ -106,6 +106,8 @@ class ModuleSettings:
 
     @classmethod
     def _setSetting(cls, name, value):
+        import qt
+
         settings = qt.QSettings()
         settings.setValue(f"SlicerPythonTestRunner/{name}", value)
         settings.sync()
