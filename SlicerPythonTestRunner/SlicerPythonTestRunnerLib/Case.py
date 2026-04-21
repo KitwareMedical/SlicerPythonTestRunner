@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass, field
 from enum import IntEnum, auto, unique
 from typing import Dict, List
@@ -108,12 +107,7 @@ class Case:
         if not nodeid:
             return []
 
-        nodeIdHead = re.split(r"[^a-zA-Z0-9:_./\\\s]", nodeid)[0]
-        nodeIdTail = nodeid[len(nodeIdHead) :]
-        nodeIdParts = nodeIdHead.split("::")
-        nodeIdParts[-1] += nodeIdTail
-
-        return nodeIdParts
+        return nodeid.split("::")
 
     @classmethod
     def caseNameFromId(cls, nodeid: str) -> str:
@@ -161,4 +155,7 @@ class Case:
         )
 
     def getRootId(self):
-        return self.nodeIdParts(self.nodeid)[0]
+        import os
+
+        root = self.nodeIdParts(self.nodeid)[0]
+        return os.path.basename(root)

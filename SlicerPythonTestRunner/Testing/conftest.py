@@ -15,9 +15,9 @@ def a_json_test_with_collect_errors_result_file():
 
 @pytest.fixture(autouse=True)
 def default_module_settings():
-    import qt
-
     try:
+        import qt
+
         settings = qt.QSettings()
         savedSettings = {}
 
@@ -31,5 +31,5 @@ def default_module_settings():
         for k, v in savedSettings.items():
             settings.setValue(k, v)
 
-    except AttributeError:
+    except (AttributeError, ModuleNotFoundError):
         yield

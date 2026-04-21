@@ -70,7 +70,6 @@ def write_cov_report(runSettings):
     reportDict = {
         "json": partial(cov.json_report, outfile=runSettings.coverageFilePath),
         "xml": partial(cov.xml_report, outfile=runSettings.coverageFilePath),
-        "lcov": partial(cov.lcov_report, outfile=runSettings.coverageFilePath),
         "html": partial(cov.html_report, directory=runSettings.coverageFilePath),
     }
 

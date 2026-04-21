@@ -5,7 +5,7 @@ import tempfile
 import traceback
 from copy import deepcopy
 from pathlib import Path
-from typing import Union
+from typing import List, Tuple, Union
 
 from .Decorator import isRunningInSlicerGui
 from .EnsureRequirements import ensureRequirements
@@ -73,7 +73,7 @@ class RunnerLogic:
             return self._runInLocalPythonAndParseResults(directory, runSettings)
 
     @classmethod
-    def _runSubProcessAndParseResults(cls, args: list[str], jsonResportPath: Path) -> Results:
+    def _runSubProcessAndParseResults(cls, args: List[str], jsonResportPath: Path) -> Results:
         cls.runInSubProcessAndWaitFinished(args)
         return Results.fromReportFile(jsonResportPath)
 
@@ -97,7 +97,7 @@ class RunnerLogic:
         """
         return self._runSubProcessAndParseResults(*self.prepareCollect(directory, runSettings))
 
-    def prepareCollect(self, directory: Union[str, Path], runSettings: RunSettings) -> tuple[list[str], Path]:
+    def prepareCollect(self, directory: Union[str, Path], runSettings: RunSettings) -> Tuple[List[str], Path]:
         return self.prepareRun(
             directory,
             RunSettings(
@@ -107,7 +107,7 @@ class RunnerLogic:
             ),
         )
 
-    def prepareRun(self, directory: Union[str, Path], runSettings: RunSettings) -> tuple[list[str], Path]:
+    def prepareRun(self, directory: Union[str, Path], runSettings: RunSettings) -> Tuple[List[str], Path]:
         """
         Prepares process args and path to JSON report path corresponding to test run with the input parameters.
         Is compatible with Python's subprocess run and QProcess.
@@ -131,7 +131,7 @@ class RunnerLogic:
         cls,
         exec_path: Union[str, Path],
         json_report_path: Union[str, Path],
-        pytest_args: list[str],
+        pytest_args: List[str],
     ) -> int:
         import pytest
         from pytest_jsonreport.plugin import JSONReport
@@ -147,6 +147,8 @@ class RunnerLogic:
                 f"--html={json_report_path.replace('.json', '.html')}",
                 "--capture=tee-sys",
                 "--cache-clear",
+                "-p",
+                "no:faulthandler",
                 *cls.formatPytestArgs(pytest_args),
             ],
             plugins=[plugin],
@@ -154,7 +156,7 @@ class RunnerLogic:
         return int(ret)
 
     @staticmethod
-    def formatPytestArgs(pytestArgs: list[str]) -> list[str]:
+    def formatPytestArgs(pytestArgs: List[str]) -> List[str]:
         from datetime import datetime
 
         from coverage.sqldata import filename_suffix
@@ -195,12 +197,12 @@ class RunnerLogic:
         return ret
 
     @staticmethod
-    def _libPaths() -> list[str]:
+    def _libPaths() -> List[str]:
         file_dir = Path(__file__).parent
         lib_dir = file_dir.parent
         return [file_dir.resolve().as_posix(), lib_dir.resolve().as_posix()]
 
-    def _createTestPythonFile(self, path: Union[str, Path], runSettings: RunSettings) -> tuple[Path, Path]:
+    def _createTestPythonFile(self, path: Union[str, Path], runSettings: RunSettings) -> Tuple[Path, Path]:
         """
         Creates a python file which will run the current file's `runPytestAndExit` in a new Slicer launcher instance
         with the passed args.
@@ -228,7 +230,7 @@ class RunnerLogic:
 
         return file_path, json_report_path
 
-    def updateTemFilePaths(self) -> tuple[Path, Path, Path]:
+    def updateTemFilePaths(self) -> Tuple[Path, Path, Path]:
         json_report_path = Path(self.tmp_path).joinpath(f"pytest_file_{self.i_test_file}.json")
         file_path = Path(self.tmp_path).joinpath(f"pytest_file_{self.i_test_file}.py")
         run_settings_path = Path(self.tmp_path).joinpath(f"pytest_run_settings_{self.i_test_file}.json")

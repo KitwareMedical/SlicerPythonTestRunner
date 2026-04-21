@@ -2,7 +2,6 @@ import os.path
 from pathlib import Path
 
 import pytest
-import qt
 from SlicerPythonTestRunnerLib import (
     Case,
     Results,
@@ -198,6 +197,8 @@ def test_can_be_run_in_slicer_context():
 
 @runTestInSlicerContext(RunSettings(doUseMainWindow=False, extraSlicerArgs=["--disable-modules"]))
 def test_runner_prepare_run_can_be_used_by_q_process(a_test_runner, a_succeeding_test_file, tmpdir):
+    import qt
+
     process = qt.QProcess()
     args, path = a_test_runner.prepareRun(directory=tmpdir, runSettings=RunSettings(doUseMainWindow=False))
     a_test_runner.startQProcess(process, args)
@@ -212,7 +213,6 @@ def test_runner_prepare_run_can_be_used_by_q_process(a_test_runner, a_succeeding
     [
         ("report.xml", ["xml"]),
         ("report.json", ["json"]),
-        ("report.info", ["lcov"]),
         ("report_dir", ["html"]),
     ],
 )

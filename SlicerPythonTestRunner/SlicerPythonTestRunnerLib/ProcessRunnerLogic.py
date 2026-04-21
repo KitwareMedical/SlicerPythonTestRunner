@@ -39,13 +39,6 @@ class TestProcess:
         self.processStarted()
 
     def stop(self):
-        import psutil
-
-        # Stop children process first
-        parent = psutil.Process(self._process.processId())
-        for child in parent.children(recursive=True):
-            child.kill()
-
         # Stop process itself
         self._process.kill()
         self._process.close()

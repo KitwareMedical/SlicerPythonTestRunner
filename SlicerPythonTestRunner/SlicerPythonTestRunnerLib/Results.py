@@ -24,7 +24,7 @@ class Results:
 
         self._testCases += results._testCases
 
-    def extend(self, resultsList: list["Results"]) -> None:
+    def extend(self, resultsList: List["Results"]) -> None:
         for results in resultsList:
             self.append(results)
 
@@ -107,5 +107,5 @@ class Results:
     def countCaseWithOutcome(self, outcomes: List[Outcome]):
         return len([c for c in self._testCases if c.outcome in outcomes])
 
-    def getFilePathList(self) -> list[str]:
+    def getFilePathList(self) -> List[str]:
         return list(sorted({c.getRootId() for c in self._testCases}))

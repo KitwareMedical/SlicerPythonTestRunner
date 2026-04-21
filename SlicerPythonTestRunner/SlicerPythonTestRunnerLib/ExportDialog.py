@@ -2,6 +2,7 @@ import os.path
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import List
 
 import slicer.util
 
@@ -10,21 +11,21 @@ from .QWidget import QDialog
 
 class ExportLogic:
     @classmethod
-    def getXmlReportFilesFromJSonList(cls, reportFiles: list[Path]) -> list[Path]:
+    def getXmlReportFilesFromJSonList(cls, reportFiles: List[Path]) -> List[Path]:
         return cls._getFileFromJsonList(reportFiles, ".xml")
 
     @classmethod
-    def getHtmlReportFilesFromJsonList(cls, reportFiles: list[Path]) -> list[Path]:
+    def getHtmlReportFilesFromJsonList(cls, reportFiles: List[Path]) -> List[Path]:
         return cls._getFileFromJsonList(reportFiles, ".html")
 
     @staticmethod
-    def _getFileFromJsonList(reportFiles: list[Path], fileExt: str) -> list[Path]:
+    def _getFileFromJsonList(reportFiles: List[Path], fileExt: str) -> List[Path]:
         files = [f.with_suffix(fileExt) for f in reportFiles]
         files = [f for f in files if f.is_file()]
         return files
 
     @staticmethod
-    def combineXmlReportFiles(reportFiles: list[Path], outFilePath: Path) -> None:
+    def combineXmlReportFiles(reportFiles: List[Path], outFilePath: Path) -> None:
         from junitparser import JUnitXml
 
         if not reportFiles:
@@ -46,7 +47,7 @@ class ExportLogic:
         run([filePath.as_posix(), outFilePath.as_posix()])
 
     @classmethod
-    def combineHtmlReportFiles(cls, reportFiles: list[Path], outFilePath: Path) -> None:
+    def combineHtmlReportFiles(cls, reportFiles: List[Path], outFilePath: Path) -> None:
         from pytest_html_merger.main import merge_html_files
 
         if not reportFiles:
@@ -69,7 +70,7 @@ class ExportLogic:
         shutil.copyfile(srcPath, destPath)
 
     @classmethod
-    def copyHtmlAssetsFolder(cls, reportFiles: list[Path], destDir: Path) -> None:
+    def copyHtmlAssetsFolder(cls, reportFiles: List[Path], destDir: Path) -> None:
         if not reportFiles:
             return
 
